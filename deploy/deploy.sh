@@ -33,6 +33,6 @@ php artisan view:cache
 php artisan event:cache
 
 # 4. Reload
-systemctl reload php8.3-fpm
+systemctl reload php8.5-fpm
 
 echo "=== Deploy selesai: $(git log -1 --oneline) ==="
