@@ -1,0 +1,35 @@
+import * as React from 'react';
+import { SidebarInset } from '@/components/ui/sidebar';
+import { cn } from '@/lib/utils';
+import type { AppVariant } from '@/types';
+
+type Props = React.ComponentProps<'main'> & {
+    variant?: AppVariant;
+};
+
+export function AppContent({
+    variant = 'sidebar',
+    className,
+    children,
+    ...props
+}: Props) {
+    if (variant === 'sidebar') {
+        return (
+            <SidebarInset className={className} {...props}>
+                {children}
+            </SidebarInset>
+        );
+    }
+
+    return (
+        <main
+            className={cn(
+                'mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl px-4 md:px-6 lg:px-8',
+                className,
+            )}
+            {...props}
+        >
+            {children}
+        </main>
+    );
+}
