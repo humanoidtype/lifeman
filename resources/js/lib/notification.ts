@@ -1,8 +1,20 @@
 import { Capacitor } from '@capacitor/core';
 import { LocalNotifications } from '@capacitor/local-notifications';
+import { httpJson } from '@/lib/http';
+import { toUrl } from '@/lib/utils';
+import { upcoming } from '@/routes/reminders';
 import type { DueReminder } from '@/types';
 
 const SCHEDULED_KEY = 'lifeman.scheduled_notifications';
+const CHANNEL_KEY = 'lifeman.notification_channel';
+const CHANNEL_ID = 'ingetin';
+
+export const SOUNDS: Array<{ id: string; label: string }> = [
+    { id: 'default', label: 'Default (sistem)' },
+    { id: 'chime', label: 'Chime' },
+    { id: 'beep', label: 'Beep' },
+    { id: 'melody', label: 'Melody' },
+];
 
 type ScheduledMap = Record<string, number>;
 
@@ -34,6 +46,37 @@ export async function ensureNotificationPermission(): Promise<boolean> {
     return status.display === 'granted';
 }
 
+export async function ensureNotificationChannel(
+    soundId: string,
+): Promise<void> {
+    if (!isNativePlatform()) {
+        return;
+    }
+
+    const sound = soundId !== 'default' ? soundId : undefined;
+
+    if (localStorage.getItem(CHANNEL_KEY) === (sound ?? 'default')) {
+        return;
+    }
+
+    try {
+        await LocalNotifications.deleteChannel({ id: CHANNEL_ID });
+    } catch {
+        // channel may not exist yet
+    }
+
+    await LocalNotifications.createChannel({
+        id: CHANNEL_ID,
+        name: 'Ingetin',
+        description: 'Notifikasi pengingat',
+        sound,
+        importance: 5,
+        vibration: true,
+    });
+
+    localStorage.setItem(CHANNEL_KEY, sound ?? 'default');
+}
+
 export async function cancelReminderNotification(
     reminderId: number,
 ): Promise<void> {
@@ -57,12 +100,14 @@ export async function cancelReminderNotification(
 
 export async function syncUpcomingReminders(
     reminders: DueReminder[],
+    soundId = 'default',
 ): Promise<void> {
     if (!isNativePlatform()) {
         return;
     }
 
     await ensureNotificationPermission();
+    await ensureNotificationChannel(soundId);
 
     const liveIds = new Set(reminders.map((reminder) => reminder.id));
     const scheduled = readScheduledMap();
@@ -72,9 +117,15 @@ export async function syncUpcomingReminders(
     );
 
     for (const id of staleIds) {
+        const staleId = scheduled[id];
+
+        if (staleId === undefined) {
+            continue;
+        }
+
         try {
             await LocalNotifications.cancel({
-                notifications: [{ id: scheduled[id] }],
+                notifications: [{ id: staleId }],
             });
         } catch {
             return;
@@ -100,12 +151,9 @@ export async function syncUpcomingReminders(
                     {
                         id: reminder.id,
                         title: reminder.title,
-                        body:
-                            reminder.body ??
-                            (reminder.type === 'time'
-                                ? 'Ingatkan waktu'
-                                : 'Ingatkan task'),
+                        body: reminder.body ?? '',
                         schedule: { at },
+                        channelId: CHANNEL_ID,
                     },
                 ],
             });
@@ -116,4 +164,29 @@ export async function syncUpcomingReminders(
     }
 
     writeScheduledMap(scheduled);
+}
+
+export async function rescheduleUpcomingReminders(
+    soundId = 'default',
+): Promise<void> {
+    if (!isNativePlatform()) {
+        return;
+    }
+
+    const reminders = await httpJson<DueReminder[]>(toUrl(upcoming()));
+
+    const scheduled = readScheduledMap();
+
+    for (const id of Object.keys(scheduled)) {
+        try {
+            await LocalNotifications.cancel({
+                notifications: [{ id: scheduled[id] }],
+            });
+        } catch {
+            return;
+        }
+    }
+
+    writeScheduledMap({});
+    await syncUpcomingReminders(reminders, soundId);
 }

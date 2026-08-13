@@ -1,5 +1,5 @@
 import { Head, Link, usePage } from '@inertiajs/react';
-import { AlarmClock, ArrowRight, ListTodo, PiggyBank } from 'lucide-react';
+import { AlarmClock, ArrowRight, PiggyBank } from 'lucide-react';
 import type { ComponentType } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toUrl } from '@/lib/utils';
@@ -17,19 +17,13 @@ type Feature = {
 
 const features: Feature[] = [
     {
-        title: 'Ingatkan Waktu',
-        description: 'Jadwal pengingat seperti di kalender.',
+        title: 'Ingetin',
+        description: 'Pengingat yang muncul sebagai notifikasi.',
         icon: AlarmClock,
-        href: toUrl(remindersIndex({ query: { type: 'time' } })),
+        href: toUrl(remindersIndex()),
     },
     {
-        title: 'Ingatkan Task',
-        description: 'Catatan yang muncul sebagai notifikasi.',
-        icon: ListTodo,
-        href: toUrl(remindersIndex({ query: { type: 'task' } })),
-    },
-    {
-        title: 'Ingatkan Nabung',
+        title: 'Nabung',
         description: 'Target tabungan dengan progress menarik.',
         icon: PiggyBank,
         href: toUrl(savingsIndex()),

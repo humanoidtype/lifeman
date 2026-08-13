@@ -51,6 +51,9 @@ jobs:
             - name: Sync Capacitor
               run: npx cap sync android
 
+            - name: Bundle notification sounds
+              run: mkdir -p android/app/src/main/res/raw && cp public/sounds/*.wav android/app/src/main/res/raw/
+
             - name: Build debug APK
               run: npm run apk:debug
 

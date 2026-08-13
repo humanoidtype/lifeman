@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Enums\ReminderType;
 use App\Http\Requests\StoreReminderRequest;
 use App\Http\Requests\UpdateReminderRequest;
 use App\Models\Reminder;
@@ -17,15 +16,11 @@ class ReminderController extends Controller
 {
     public function index(Request $request): Response
     {
-        $type = $request->enum('type', ReminderType::class);
-
         return Inertia::render('reminders/index', [
             'reminders' => Reminder::query()
                 ->whereBelongsTo(auth()->user())
-                ->when($type, fn ($query) => $query->where('type', $type))
                 ->latest('remind_at')
                 ->paginate(20),
-            'filter' => $type?->value,
         ]);
     }
 
@@ -58,7 +53,7 @@ class ReminderController extends Controller
             ->whereBelongsTo(auth()->user())
             ->due()
             ->orderBy('remind_at')
-            ->get(['id', 'type', 'title', 'body', 'remind_at']);
+            ->get(['id', 'title', 'body', 'remind_at']);
 
         return response()->json($reminders);
     }
@@ -69,7 +64,7 @@ class ReminderController extends Controller
             ->whereBelongsTo(auth()->user())
             ->upcoming()
             ->orderBy('remind_at')
-            ->get(['id', 'type', 'title', 'body', 'remind_at']);
+            ->get(['id', 'title', 'body', 'remind_at']);
 
         return response()->json($reminders);
     }

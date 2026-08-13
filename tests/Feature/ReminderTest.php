@@ -1,6 +1,5 @@
 <?php
 
-use App\Enums\ReminderType;
 use App\Models\Reminder;
 use App\Models\User;
 
@@ -21,12 +20,11 @@ test('authenticated users can list their reminders', function () {
             ->has('reminders.data', 3));
 });
 
-test('users can create a time reminder', function () {
+test('users can create a reminder', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
         ->post(route('reminders.store'), [
-            'type' => ReminderType::Time->value,
             'title' => 'Minum obat',
             'body' => 'Jangan lupa',
             'remind_at' => now()->addHour()->format('Y-m-d H:i'),
@@ -35,37 +33,25 @@ test('users can create a time reminder', function () {
 
     $this->assertDatabaseHas('reminders', [
         'user_id' => $user->id,
-        'type' => ReminderType::Time->value,
         'title' => 'Minum obat',
     ]);
 });
 
-test('users can create a task reminder without remind_at', function () {
+test('reminder validation requires title and a future remind_at', function () {
     $user = User::factory()->create();
 
     $this->actingAs($user)
         ->post(route('reminders.store'), [
-            'type' => ReminderType::Task->value,
-            'title' => 'Belanja mingguan',
-        ])
-        ->assertRedirect();
-
-    $this->assertDatabaseHas('reminders', [
-        'user_id' => $user->id,
-        'title' => 'Belanja mingguan',
-    ]);
-});
-
-test('reminder validation requires title and valid fields', function () {
-    $user = User::factory()->create();
-
-    $this->actingAs($user)
-        ->post(route('reminders.store'), [
-            'type' => ReminderType::Time->value,
             'title' => '',
             'remind_at' => now()->subDay()->format('Y-m-d H:i'),
         ])
         ->assertSessionHasErrors(['title', 'remind_at']);
+
+    $this->actingAs($user)
+        ->post(route('reminders.store'), [
+            'title' => 'Tanpa waktu',
+        ])
+        ->assertSessionHasErrors(['remind_at']);
 });
 
 test('users cannot see or modify reminders of other users', function () {

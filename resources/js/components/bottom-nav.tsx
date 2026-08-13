@@ -1,6 +1,6 @@
 import { Link } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
-import { AlarmClock, Home, ListTodo, PiggyBank, User } from 'lucide-react';
+import { AlarmClock, Home, PiggyBank, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
@@ -10,16 +10,7 @@ import { index as savingsIndex } from '@/routes/savings-goals';
 
 const items = [
     { title: 'Beranda', icon: Home, href: dashboard() },
-    {
-        title: 'Waktu',
-        icon: AlarmClock,
-        href: remindersIndex({ query: { type: 'time' } }),
-    },
-    {
-        title: 'Task',
-        icon: ListTodo,
-        href: remindersIndex({ query: { type: 'task' } }),
-    },
+    { title: 'Ingetin', icon: AlarmClock, href: remindersIndex() },
     { title: 'Nabung', icon: PiggyBank, href: savingsIndex() },
     { title: 'Profil', icon: User, href: profile.edit() },
 ];
@@ -29,26 +20,11 @@ const baseUrl = 'http://life-man.test';
 export function BottomNav() {
     const page = usePage();
     const pathname = new URL(page.url, baseUrl).pathname;
-    const search = new URL(page.url, baseUrl).search;
 
     function isActive(href: string): boolean {
         const target = new URL(href, baseUrl);
 
-        if (pathname !== target.pathname) {
-            return false;
-        }
-
-        const type = target.searchParams.get('type');
-
-        if (target.pathname === toUrl(remindersIndex())) {
-            if (type === 'task') {
-                return search.includes('type=task');
-            }
-
-            return !search.includes('type=task');
-        }
-
-        return true;
+        return pathname === target.pathname;
     }
 
     return (

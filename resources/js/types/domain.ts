@@ -1,8 +1,5 @@
-export type ReminderType = 'time' | 'task';
-
 export type Reminder = {
     id: number;
-    type: ReminderType;
     title: string;
     body: string | null;
     remind_at: string | null;
@@ -14,7 +11,6 @@ export type Reminder = {
 
 export type DueReminder = {
     id: number;
-    type: ReminderType;
     title: string;
     body: string | null;
     remind_at: string | null;

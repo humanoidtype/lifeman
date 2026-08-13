@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Enums\ReminderType;
 use App\Models\Reminder;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -21,26 +20,10 @@ class ReminderFactory extends Factory
     {
         return [
             'user_id' => User::factory(),
-            'type' => ReminderType::Time,
             'title' => fake()->sentence(3),
             'body' => fake()->sentence(),
             'remind_at' => now()->addDay(),
         ];
-    }
-
-    public function timeReminder(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'type' => ReminderType::Time,
-        ]);
-    }
-
-    public function taskReminder(): static
-    {
-        return $this->state(fn (array $attributes) => [
-            'type' => ReminderType::Task,
-            'remind_at' => null,
-        ]);
     }
 
     public function done(): static

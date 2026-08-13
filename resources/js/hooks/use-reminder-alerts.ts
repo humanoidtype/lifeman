@@ -31,7 +31,10 @@ export function useReminderAlerts() {
                 );
 
                 if (isNativePlatform()) {
-                    await syncUpcomingReminders(upcomingReminders);
+                    await syncUpcomingReminders(
+                        upcomingReminders,
+                        user.notification_sound ?? 'default',
+                    );
                 }
 
                 const dueReminders = await httpJson<DueReminder[]>(

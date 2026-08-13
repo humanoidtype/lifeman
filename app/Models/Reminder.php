@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Enums\ReminderType;
 use Database\Factories\ReminderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -15,7 +14,6 @@ use Illuminate\Support\Carbon;
 /**
  * @property int $id
  * @property int $user_id
- * @property ReminderType $type
  * @property string $title
  * @property string|null $body
  * @property Carbon|null $remind_at
@@ -24,7 +22,7 @@ use Illuminate\Support\Carbon;
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */
-#[Fillable(['user_id', 'type', 'title', 'body', 'remind_at', 'done_at', 'notified_at'])]
+#[Fillable(['user_id', 'title', 'body', 'remind_at', 'done_at', 'notified_at'])]
 class Reminder extends Model
 {
     /** @use HasFactory<ReminderFactory> */
@@ -38,7 +36,6 @@ class Reminder extends Model
     protected function casts(): array
     {
         return [
-            'type' => ReminderType::class,
             'remind_at' => 'datetime',
             'done_at' => 'datetime',
             'notified_at' => 'datetime',

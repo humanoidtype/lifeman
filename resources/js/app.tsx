@@ -1,13 +1,20 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { LoadingOverlay } from '@/components/loading-overlay';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
-import { LoadingOverlay } from '@/components/loading-overlay';
 import { initializeTheme } from '@/hooks/use-appearance';
+import { useBackHandler } from '@/hooks/use-back-handler';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+function BackButtonHandler() {
+    useBackHandler();
+
+    return null;
+}
 
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
@@ -30,6 +37,7 @@ createInertiaApp({
                 {app}
                 <Toaster />
                 <LoadingOverlay />
+                <BackButtonHandler />
             </TooltipProvider>
         );
     },

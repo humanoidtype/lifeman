@@ -1,4 +1,4 @@
-import { AlarmClock, ListTodo } from 'lucide-react';
+import { AlarmClock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { useReminderAlerts } from '@/hooks/use-reminder-alerts';
@@ -37,7 +37,7 @@ function ReminderBannerItem({
     onDismiss: () => void;
     onComplete: () => void;
 }) {
-    const Icon = reminder.type === 'time' ? AlarmClock : ListTodo;
+    const Icon = AlarmClock;
 
     return (
         <Card className="animate-in rounded-2xl border-border/70 shadow-lg shadow-black/5 fade-in slide-in-from-bottom-2">
@@ -63,11 +63,9 @@ function ReminderBannerItem({
                 </div>
 
                 <div className="flex shrink-0 gap-2">
-                    {reminder.type === 'task' && (
-                        <Button size="sm" onClick={onComplete}>
-                            Selesai
-                        </Button>
-                    )}
+                    <Button size="sm" onClick={onComplete}>
+                        Selesai
+                    </Button>
                     <Button size="sm" variant="ghost" onClick={onDismiss}>
                         Tutup
                     </Button>

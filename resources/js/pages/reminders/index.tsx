@@ -1,14 +1,6 @@
-import { Head, Link, router, useForm } from '@inertiajs/react';
-import {
-    AlarmClock,
-    Check,
-    ListTodo,
-    Pencil,
-    Plus,
-    Trash2,
-} from 'lucide-react';
+import { Head, router, useForm } from '@inertiajs/react';
+import { Check, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -21,31 +13,16 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
 import { formatDateTime } from '@/lib/format';
 import { toUrl } from '@/lib/utils';
-import { index, store, update, destroy, done } from '@/routes/reminders';
-import type { PaginatedData, Reminder, ReminderType } from '@/types';
+import { store, update, destroy, done } from '@/routes/reminders';
+import type { PaginatedData, Reminder } from '@/types';
 
 type Props = {
     reminders: PaginatedData<Reminder>;
-    filter: ReminderType | null;
 };
 
-const tabs: Array<{ label: string; value: ReminderType | null }> = [
-    { label: 'Semua', value: null },
-    { label: 'Waktu', value: 'time' },
-    { label: 'Task', value: 'task' },
-];
-
 type ReminderForm = {
-    type: ReminderType;
     title: string;
     body: string;
     remind_at: string;
@@ -62,23 +39,22 @@ function toDateTimeLocal(value: string | null | undefined): string {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export default function RemindersIndex({ reminders, filter }: Props) {
+export default function RemindersIndex({ reminders }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editing, setEditing] = useState<Reminder | null>(null);
 
     return (
         <>
-            <Head title="Ingatkan" />
+            <Head title="Ingetin" />
 
             <div className="flex flex-col gap-6">
                 <div className="flex items-center justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Ingatkan
+                            Ingetin
                         </h1>
                         <p className="text-sm text-muted-foreground">
-                            Pengingat waktu dan task akan muncul sebagai
-                            notifikasi.
+                            Pengingat akan muncul sebagai notifikasi.
                         </p>
                     </div>
                     <Button onClick={() => setCreateOpen(true)}>
@@ -87,32 +63,10 @@ export default function RemindersIndex({ reminders, filter }: Props) {
                     </Button>
                 </div>
 
-                <div className="flex gap-2">
-                    {tabs.map((tab) => (
-                        <Link
-                            key={tab.label}
-                            href={toUrl(
-                                index({
-                                    query: tab.value
-                                        ? { type: tab.value }
-                                        : undefined,
-                                }),
-                            )}
-                            className={
-                                filter === tab.value
-                                    ? 'rounded-full bg-primary px-4 py-1.5 text-sm font-medium text-primary-foreground'
-                                    : 'rounded-full bg-muted px-4 py-1.5 text-sm font-medium text-muted-foreground'
-                            }
-                        >
-                            {tab.label}
-                        </Link>
-                    ))}
-                </div>
-
                 <div className="flex flex-col gap-3">
                     {reminders.data.length === 0 && (
                         <p className="py-10 text-center text-sm text-muted-foreground">
-                            Belum ada ingatkan. Tambahkan yang baru untuk mulai.
+                            Belum ada ingetin. Tambahkan yang baru untuk mulai.
                         </p>
                     )}
 
@@ -129,7 +83,7 @@ export default function RemindersIndex({ reminders, filter }: Props) {
             <ReminderFormDialog
                 open={createOpen}
                 onOpenChange={setCreateOpen}
-                title="Tambah Ingatkan"
+                title="Tambah Ingetin"
                 description="Buat pengingat baru."
             />
 
@@ -138,7 +92,7 @@ export default function RemindersIndex({ reminders, filter }: Props) {
                 open={editing !== null}
                 onOpenChange={(open) => !open && setEditing(null)}
                 reminder={editing ?? undefined}
-                title="Ubah Ingatkan"
+                title="Ubah Ingetin"
                 description="Perbarui detail pengingat."
             />
         </>
@@ -152,15 +106,12 @@ function ReminderCard({
     reminder: Reminder;
     onEdit: () => void;
 }) {
-    const isTime = reminder.type === 'time';
-    const Icon = isTime ? AlarmClock : ListTodo;
-
     function markDone(): void {
         router.patch(toUrl(done({ reminder: reminder.id })));
     }
 
     function remove(): void {
-        if (window.confirm(`Hapus ingatkan "${reminder.title}"?`)) {
+        if (window.confirm(`Hapus ingetin "${reminder.title}"?`)) {
             router.delete(toUrl(destroy({ reminder: reminder.id })));
         }
     }
@@ -168,7 +119,6 @@ function ReminderCard({
     return (
         <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
             <CardContent className="flex items-center gap-3 p-4">
-                {' '}
                 <Button
                     size="icon"
                     variant="outline"
@@ -179,13 +129,7 @@ function ReminderCard({
                     <Check className="size-4" />
                 </Button>
                 <div className="min-w-0 flex-1">
-                    <div className="flex flex-wrap items-center gap-2">
-                        <p className="font-semibold">{reminder.title}</p>
-                        <Badge variant={isTime ? 'default' : 'secondary'}>
-                            <Icon className="mr-1 size-3" />
-                            {isTime ? 'Waktu' : 'Task'}
-                        </Badge>
-                    </div>
+                    <p className="font-semibold">{reminder.title}</p>
                     {reminder.body && (
                         <p className="truncate text-sm text-muted-foreground">
                             {reminder.body}
@@ -224,19 +168,21 @@ function ReminderFormDialog({
     description: string;
 }) {
     const isEditing = reminder !== undefined;
-    const { data, setData, errors, processing, post, put, reset } =
+    const { data, setData, errors, processing, post, put, reset, transform } =
         useForm<ReminderForm>({
-            type: reminder?.type ?? 'time',
             title: reminder?.title ?? '',
             body: reminder?.body ?? '',
             remind_at: toDateTimeLocal(reminder?.remind_at),
         });
 
-    function submit(): void {
-        if (data.type !== 'time') {
-            setData('remind_at', '');
-        }
+    transform((values) => ({
+        ...values,
+        remind_at: values.remind_at
+            ? new Date(values.remind_at).toISOString()
+            : '',
+    }));
 
+    function submit(): void {
         const onSuccess = () => {
             onOpenChange(false);
             reset();
@@ -259,28 +205,6 @@ function ReminderFormDialog({
 
                 <div className="grid gap-4 py-2">
                     <div className="grid gap-2">
-                        <Label htmlFor="reminder-type">Tipe</Label>
-                        <Select
-                            value={data.type}
-                            onValueChange={(value) =>
-                                setData('type', value as ReminderType)
-                            }
-                        >
-                            <SelectTrigger id="reminder-type">
-                                <SelectValue placeholder="Pilih tipe" />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectItem value="time">
-                                    Ingatkan Waktu
-                                </SelectItem>
-                                <SelectItem value="task">
-                                    Ingatkan Task
-                                </SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
-
-                    <div className="grid gap-2">
                         <Label htmlFor="reminder-title">Judul</Label>
                         <Input
                             id="reminder-title"
@@ -297,24 +221,22 @@ function ReminderFormDialog({
                         )}
                     </div>
 
-                    {data.type === 'time' && (
-                        <div className="grid gap-2">
-                            <Label htmlFor="reminder-at">Kapan</Label>
-                            <Input
-                                id="reminder-at"
-                                type="datetime-local"
-                                value={data.remind_at}
-                                onChange={(event) =>
-                                    setData('remind_at', event.target.value)
-                                }
-                            />
-                            {errors.remind_at && (
-                                <p className="text-sm text-destructive">
-                                    {errors.remind_at}
-                                </p>
-                            )}
-                        </div>
-                    )}
+                    <div className="grid gap-2">
+                        <Label htmlFor="reminder-at">Kapan</Label>
+                        <Input
+                            id="reminder-at"
+                            type="datetime-local"
+                            value={data.remind_at}
+                            onChange={(event) =>
+                                setData('remind_at', event.target.value)
+                            }
+                        />
+                        {errors.remind_at && (
+                            <p className="text-sm text-destructive">
+                                {errors.remind_at}
+                            </p>
+                        )}
+                    </div>
 
                     <div className="grid gap-2">
                         <Label htmlFor="reminder-body">
