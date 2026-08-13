@@ -111,66 +111,66 @@ export default function SavingsShow({ goal, payments }: Props) {
 
                 <div className="grid gap-3 sm:grid-cols-2">
                     <Card className="h-full">
-                            <CardHeader className="pb-2">
-                                <CardDescription>Target</CardDescription>
-                                <CardTitle className="text-3xl">
-                                    {formatMoney(target)}
-                                </CardTitle>
-                                <CardDescription>
-                                    {formatDate(goal.start_date)} –{' '}
-                                    {formatDate(goal.end_date)}
-                                </CardDescription>
-                            </CardHeader>
-                        </Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Target</CardDescription>
+                            <CardTitle className="text-3xl">
+                                {formatMoney(target)}
+                            </CardTitle>
+                            <CardDescription>
+                                {formatDate(goal.start_date)} –{' '}
+                                {formatDate(goal.end_date)}
+                            </CardDescription>
+                        </CardHeader>
+                    </Card>
 
                     <Card className="h-full">
-                            <CardHeader className="pb-2">
-                                <CardDescription>Terkumpul</CardDescription>
-                                <CardTitle className="text-3xl">
-                                    {formatMoney(paid)}
-                                </CardTitle>
-                                {reached ? (
-                                    <CardDescription className="font-medium text-emerald-600">
-                                        Target tercapai, bagus!
-                                    </CardDescription>
-                                ) : (
-                                    <CardDescription>
-                                        Kurang {formatMoney(target - paid)} lagi
-                                    </CardDescription>
-                                )}
-                            </CardHeader>
-                        </Card>
+                        <CardHeader className="pb-2">
+                            <CardDescription>Terkumpul</CardDescription>
+                            <CardTitle className="text-3xl">
+                                {formatMoney(paid)}
+                            </CardTitle>
+                            {reached ? (
+                                <CardDescription className="font-medium text-emerald-600">
+                                    Target tercapai, bagus!
+                                </CardDescription>
+                            ) : (
+                                <CardDescription>
+                                    Kurang {formatMoney(target - paid)} lagi
+                                </CardDescription>
+                            )}
+                        </CardHeader>
+                    </Card>
                 </div>
 
                 <Card>
-                        <CardContent className="grid gap-3 p-5">
-                            <div className="flex items-baseline justify-between text-sm">
-                                <span className="font-semibold">
-                                    {formatPercent(percent)}
-                                </span>
-                                <span className="text-muted-foreground">
-                                    {formatMoney(paid)} dari {formatMoney(target)}
-                                </span>
-                            </div>
-                            <div className="h-3 overflow-hidden rounded-full bg-muted">
-                                <div
-                                    className="h-full rounded-full bg-primary transition-all duration-700"
-                                    style={{ width: `${Math.min(percent, 100)}%` }}
-                                />
-                            </div>
-                        </CardContent>
-                    </Card>
+                    <CardContent className="grid gap-3 p-5">
+                        <div className="flex items-baseline justify-between text-sm">
+                            <span className="font-semibold">
+                                {formatPercent(percent)}
+                            </span>
+                            <span className="text-muted-foreground">
+                                {formatMoney(paid)} dari {formatMoney(target)}
+                            </span>
+                        </div>
+                        <div className="h-3 overflow-hidden rounded-full bg-muted">
+                            <div
+                                className="h-full rounded-full bg-primary transition-all duration-700"
+                                style={{ width: `${Math.min(percent, 100)}%` }}
+                            />
+                        </div>
+                    </CardContent>
+                </Card>
 
                 {sortedPayments.length > 1 && (
                     <Card>
-                            <CardHeader>
-                                <CardTitle className="text-base">
-                                    Progress Cicilan
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="h-64">
-                                    <Line
+                        <CardHeader>
+                            <CardTitle className="text-base">
+                                Progress Cicilan
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent>
+                            <div className="h-64">
+                                <Line
                                     data={{
                                         labels: chartLabels,
                                         datasets: [
@@ -214,11 +214,11 @@ export default function SavingsShow({ goal, payments }: Props) {
                 )}
 
                 <Card>
-                        <CardHeader>
-                            <CardTitle className="text-base">
-                                Catat Cicilan
-                            </CardTitle>
-                        </CardHeader>
+                    <CardHeader>
+                        <CardTitle className="text-base">
+                            Catat Cicilan
+                        </CardTitle>
+                    </CardHeader>
                     <CardContent className="grid gap-3 sm:grid-cols-[1fr_auto_1fr_auto]">
                         <div className="grid gap-2">
                             <Label htmlFor="payment-amount">Nominal</Label>
@@ -281,37 +281,37 @@ export default function SavingsShow({ goal, payments }: Props) {
 
                 {sortedPayments.length > 0 && (
                     <Card>
-                            <CardHeader>
-                                <CardTitle className="text-base">
-                                    Riwayat Cicilan
-                                </CardTitle>
-                            </CardHeader>
-                            <CardContent className="grid gap-2">
-                                {[...sortedPayments].reverse().map((payment) => (
-                                    <div
-                                        key={payment.id}
-                                        className="flex items-center gap-3 rounded-lg border p-3 transition-colors duration-200 hover:bg-muted/50"
-                                    >
-                                        <div className="min-w-0 flex-1">
-                                            <p className="font-semibold">
-                                                {formatMoney(payment.amount)}
-                                            </p>
-                                            <p className="text-xs text-muted-foreground">
-                                                {payment.note &&
-                                                    `${payment.note} · `}
-                                                {formatDate(payment.paid_at)}
-                                            </p>
-                                        </div>
-                                        <Button
-                                            size="icon"
-                                            variant="ghost"
-                                            onClick={() => removePayment(payment)}
-                                        >
-                                            <Trash2 className="size-4 text-destructive" />
-                                        </Button>
+                        <CardHeader>
+                            <CardTitle className="text-base">
+                                Riwayat Cicilan
+                            </CardTitle>
+                        </CardHeader>
+                        <CardContent className="grid gap-2">
+                            {[...sortedPayments].reverse().map((payment) => (
+                                <div
+                                    key={payment.id}
+                                    className="flex items-center gap-3 rounded-lg border p-3 transition-colors duration-200 hover:bg-muted/50"
+                                >
+                                    <div className="min-w-0 flex-1">
+                                        <p className="font-semibold">
+                                            {formatMoney(payment.amount)}
+                                        </p>
+                                        <p className="text-xs text-muted-foreground">
+                                            {payment.note &&
+                                                `${payment.note} · `}
+                                            {formatDate(payment.paid_at)}
+                                        </p>
                                     </div>
-                                ))}
-                            </CardContent>
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        onClick={() => removePayment(payment)}
+                                    >
+                                        <Trash2 className="size-4 text-destructive" />
+                                    </Button>
+                                </div>
+                            ))}
+                        </CardContent>
                     </Card>
                 )}
             </div>

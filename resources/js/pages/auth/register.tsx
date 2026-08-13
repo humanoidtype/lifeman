@@ -81,7 +81,9 @@ export default function Register({ passwordRules }: Props) {
                                 placeholder="Confirm password"
                                 passwordrules={passwordRules}
                             />
-                            <InputError message={errors.password_confirmation} />
+                            <InputError
+                                message={errors.password_confirmation}
+                            />
                         </div>
 
                         <Button

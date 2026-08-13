@@ -167,7 +167,9 @@ function ReminderCard({
 
     return (
         <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
-            <CardContent className="flex items-center gap-3 p-4">                <Button
+            <CardContent className="flex items-center gap-3 p-4">
+                {' '}
+                <Button
                     size="icon"
                     variant="outline"
                     className="size-9 shrink-0 rounded-full"
@@ -176,7 +178,6 @@ function ReminderCard({
                 >
                     <Check className="size-4" />
                 </Button>
-
                 <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-2">
                         <p className="font-semibold">{reminder.title}</p>
@@ -196,7 +197,6 @@ function ReminderCard({
                         </p>
                     )}
                 </div>
-
                 <div className="flex shrink-0 gap-1">
                     <Button size="icon" variant="ghost" onClick={onEdit}>
                         <Pencil className="size-4" />

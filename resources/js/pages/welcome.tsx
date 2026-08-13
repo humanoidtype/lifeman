@@ -1,12 +1,7 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import { AlarmClock, ArrowRight, ListTodo, PiggyBank } from 'lucide-react';
 import type { ComponentType } from 'react';
-import {
-    Card,
-    CardContent,
-    CardHeader,
-    CardTitle,
-} from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toUrl } from '@/lib/utils';
 import { dashboard, login } from '@/routes';
 import { register } from '@/routes';
@@ -50,7 +45,9 @@ export default function Welcome() {
 
             <div className="flex min-h-dvh flex-col p-6 lg:justify-center lg:p-8">
                 <header className="mx-auto mb-10 flex w-full max-w-3xl items-center justify-between">
-                    <span className="font-semibold tracking-tight">Life Man</span>
+                    <span className="font-semibold tracking-tight">
+                        Life Man
+                    </span>
                     {auth.user ? (
                         <Link
                             href={dashboard()}
