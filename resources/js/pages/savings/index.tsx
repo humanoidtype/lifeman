@@ -1,5 +1,5 @@
 import { Head, Link, useForm } from '@inertiajs/react';
-import { ArrowRight, PiggyBank, Plus } from 'lucide-react';
+import { ArrowRight, CalendarClock, PiggyBank, Plus } from 'lucide-react';
 import { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDate, formatMoney, formatPercent } from '@/lib/format';
-import { toUrl } from '@/lib/utils';
+import { cn, toUrl } from '@/lib/utils';
 import { show, store } from '@/routes/savings-goals';
 import type { PaginatedData, SavingsGoal } from '@/types';
 
@@ -77,6 +77,19 @@ function GoalCard({ goal }: { goal: SavingsGoal }) {
     const target = Number(goal.target_amount);
     const percent = target > 0 ? (paid / target) * 100 : 0;
     const reached = paid >= target;
+    const remaining = Math.max(target - paid, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const end = goal.end_date ? new Date(`${goal.end_date}T00:00:00`) : null;
+    const missed = !reached && end !== null && end.getTime() < today.getTime();
+    const daysLeft = end
+        ? Math.max(Math.ceil((end.getTime() - today.getTime()) / 86_400_000), 0)
+        : 0;
+    const perDay =
+        !reached && !missed && end !== null && daysLeft > 0
+            ? Math.ceil(remaining / daysLeft)
+            : 0;
 
     return (
         <Link
@@ -92,8 +105,18 @@ function GoalCard({ goal }: { goal: SavingsGoal }) {
                             {goal.title}
                             <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                         </CardTitle>
-                        <Badge variant={reached ? 'default' : 'secondary'}>
-                            {reached ? 'Tercapai' : 'Berjalan'}
+                        <Badge
+                            variant={reached ? 'default' : 'secondary'}
+                            className={cn(
+                                missed &&
+                                    'bg-destructive text-destructive-foreground',
+                            )}
+                        >
+                            {reached
+                                ? 'Tercapai'
+                                : missed
+                                  ? 'Terlewat'
+                                  : 'Berjalan'}
                         </Badge>
                     </div>
                 </CardHeader>
@@ -108,7 +131,14 @@ function GoalCard({ goal }: { goal: SavingsGoal }) {
                     </div>
                     <div className="h-2 overflow-hidden rounded-full bg-muted">
                         <div
-                            className="h-full rounded-full bg-primary transition-all duration-700"
+                            className={cn(
+                                'h-full rounded-full transition-all duration-700',
+                                reached
+                                    ? 'bg-emerald-500'
+                                    : missed
+                                      ? 'bg-destructive'
+                                      : 'bg-gradient-to-r from-primary to-primary/60',
+                            )}
                             style={{ width: `${Math.min(percent, 100)}%` }}
                         />
                     </div>
@@ -121,6 +151,40 @@ function GoalCard({ goal }: { goal: SavingsGoal }) {
                                 : ''}
                         </span>
                     </div>
+
+                    {!reached && perDay > 0 && (
+                        <div className="flex items-center gap-1.5 rounded-lg bg-primary/5 px-2.5 py-1.5 text-[11px] text-muted-foreground">
+                            <CalendarClock className="size-3.5 shrink-0 text-primary" />
+                            <span>
+                                Cicil{' '}
+                                <span className="font-semibold text-foreground">
+                                    ±{formatMoney(perDay)}
+                                </span>
+                                /hari ·{' '}
+                                <span className="font-semibold text-foreground">
+                                    ±{formatMoney(perDay * 7)}
+                                </span>
+                                /minggu ·{' '}
+                                <span className="font-semibold text-foreground">
+                                    ±{formatMoney(perDay * 30)}
+                                </span>
+                                /bulan
+                            </span>
+                        </div>
+                    )}
+
+                    {!reached && missed && (
+                        <p className="text-xs font-medium text-destructive">
+                            Target terlewat — kurang {formatMoney(remaining)}{' '}
+                            lagi
+                        </p>
+                    )}
+
+                    {!reached && !missed && perDay === 0 && (
+                        <p className="text-xs text-muted-foreground">
+                            Kurang {formatMoney(remaining)} lagi
+                        </p>
+                    )}
                 </CardContent>
             </Card>
         </Link>

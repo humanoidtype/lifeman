@@ -1,5 +1,13 @@
 import { Head, router, useForm } from '@inertiajs/react';
-import { Check, Pencil, Plus, Trash2 } from 'lucide-react';
+import {
+    CalendarX2,
+    Check,
+    CircleCheck,
+    Clock3,
+    Pencil,
+    Plus,
+    Trash2,
+} from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -14,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDateTime } from '@/lib/format';
-import { toUrl } from '@/lib/utils';
+import { cn, toUrl } from '@/lib/utils';
 import { store, update, destroy, done } from '@/routes/reminders';
 import type { PaginatedData, Reminder } from '@/types';
 
@@ -106,6 +114,10 @@ function ReminderCard({
     reminder: Reminder;
     onEdit: () => void;
 }) {
+    const isDone = reminder.done_at !== null;
+    const isExpired = !isDone && reminder.is_expired;
+    const Icon = isDone ? CircleCheck : isExpired ? CalendarX2 : Clock3;
+
     function markDone(): void {
         router.patch(toUrl(done({ reminder: reminder.id })));
     }
@@ -117,27 +129,58 @@ function ReminderCard({
     }
 
     return (
-        <Card className="transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md">
+        <Card
+            className={cn(
+                'transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md',
+                isExpired &&
+                    'border-destructive/40 bg-destructive/5 hover:border-destructive/60',
+                isDone && 'opacity-70 hover:opacity-90',
+            )}
+        >
             <CardContent className="flex items-center gap-3 p-4">
                 <Button
                     size="icon"
                     variant="outline"
-                    className="size-9 shrink-0 rounded-full"
+                    disabled={isDone}
+                    className={cn(
+                        'size-9 shrink-0 rounded-full',
+                        isDone &&
+                            'border-primary bg-primary text-primary-foreground hover:bg-primary',
+                        !isDone &&
+                            'hover:border-primary hover:bg-primary hover:text-primary-foreground',
+                    )}
                     onClick={markDone}
-                    title="Tandai selesai"
+                    title={isDone ? 'Selesai' : 'Tandai selesai'}
                 >
                     <Check className="size-4" />
                 </Button>
                 <div className="min-w-0 flex-1">
-                    <p className="font-semibold">{reminder.title}</p>
+                    <p
+                        className={cn(
+                            'font-semibold',
+                            isDone && 'text-muted-foreground line-through',
+                        )}
+                    >
+                        {reminder.title}
+                    </p>
                     {reminder.body && (
                         <p className="truncate text-sm text-muted-foreground">
                             {reminder.body}
                         </p>
                     )}
                     {reminder.remind_at && (
-                        <p className="text-xs text-muted-foreground">
-                            {formatDateTime(reminder.remind_at)}
+                        <p
+                            className={cn(
+                                'flex items-center gap-1.5 text-xs text-muted-foreground',
+                                isExpired && 'font-medium text-destructive',
+                            )}
+                        >
+                            {isExpired && (
+                                <Icon className="size-3.5 shrink-0" />
+                            )}
+                            {isExpired
+                                ? `Terlewat • ${formatDateTime(reminder.remind_at)}`
+                                : formatDateTime(reminder.remind_at)}
                         </p>
                     )}
                 </div>

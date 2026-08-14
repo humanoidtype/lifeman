@@ -5,6 +5,7 @@ export type Reminder = {
     remind_at: string | null;
     done_at: string | null;
     notified_at: string | null;
+    is_expired: boolean;
     created_at: string;
     updated_at: string;
 };

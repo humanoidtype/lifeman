@@ -17,6 +17,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return Inertia::render('dashboard', [
             'stats' => [
                 'pendingReminders' => Reminder::query()->whereBelongsTo(auth()->user())->pending()->count(),
+                'overdueReminders' => Reminder::query()->whereBelongsTo(auth()->user())->overdue()->count(),
                 'activeGoals' => SavingsGoal::query()->whereBelongsTo(auth()->user())->active()->count(),
                 'savedAmount' => (float) SavingsGoal::query()
                     ->whereBelongsTo(auth()->user())

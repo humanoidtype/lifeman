@@ -19,6 +19,7 @@ class ReminderController extends Controller
         return Inertia::render('reminders/index', [
             'reminders' => Reminder::query()
                 ->whereBelongsTo(auth()->user())
+                ->orderByRaw('done_at IS NULL DESC')
                 ->latest('remind_at')
                 ->paginate(20),
         ]);

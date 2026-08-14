@@ -1,10 +1,18 @@
 import { Form, Head } from '@inertiajs/react';
+import { KeyRound, ShieldCheck } from 'lucide-react';
 import { useRef } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
 import { edit } from '@/routes/security';
 
@@ -18,104 +26,138 @@ export default function Security(props: Props) {
 
     return (
         <>
-            <Head title="Security settings" />
+            <Head title="Keamanan" />
 
-            <h1 className="sr-only">Security settings</h1>
+            <h1 className="sr-only">Pengaturan keamanan</h1>
 
             <div className="space-y-6">
                 <Heading
                     variant="small"
-                    title="Update password"
-                    description="Ensure your account is using a long, random password to stay secure"
+                    title="Keamanan"
+                    description="Jaga akunmu tetap aman dengan password yang kuat"
                 />
 
-                <Form
-                    {...SecurityController.update.form()}
-                    options={{
-                        preserveScroll: true,
-                    }}
-                    resetOnError={[
-                        'password',
-                        'password_confirmation',
-                        'current_password',
-                    ]}
-                    resetOnSuccess
-                    onError={(errors) => {
-                        if (errors.password) {
-                            passwordInput.current?.focus();
-                        }
+                <Card className="overflow-hidden rounded-2xl">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                        <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                            <KeyRound className="size-4" />
+                        </span>
+                        <div>
+                            <CardTitle className="text-base">
+                                Ubah password
+                            </CardTitle>
+                            <CardDescription>
+                                Gunakan password yang panjang dan unik
+                            </CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="p-5">
+                        <Form
+                            {...SecurityController.update.form()}
+                            options={{
+                                preserveScroll: true,
+                            }}
+                            resetOnError={[
+                                'password',
+                                'password_confirmation',
+                                'current_password',
+                            ]}
+                            resetOnSuccess
+                            onError={(errors) => {
+                                if (errors.password) {
+                                    passwordInput.current?.focus();
+                                }
 
-                        if (errors.current_password) {
-                            currentPasswordInput.current?.focus();
-                        }
-                    }}
-                    className="space-y-6"
-                >
-                    {({ errors, processing }) => (
-                        <>
-                            <div className="grid gap-2">
-                                <Label htmlFor="current_password">
-                                    Current password
-                                </Label>
+                                if (errors.current_password) {
+                                    currentPasswordInput.current?.focus();
+                                }
+                            }}
+                            className="space-y-4"
+                        >
+                            {({ errors, processing }) => (
+                                <>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="current_password">
+                                            Password saat ini
+                                        </Label>
 
-                                <PasswordInput
-                                    id="current_password"
-                                    ref={currentPasswordInput}
-                                    name="current_password"
-                                    className="mt-1 block w-full"
-                                    autoComplete="current-password"
-                                    placeholder="Current password"
-                                />
+                                        <PasswordInput
+                                            id="current_password"
+                                            ref={currentPasswordInput}
+                                            name="current_password"
+                                            className="mt-1 block w-full rounded-xl"
+                                            autoComplete="current-password"
+                                            placeholder="Password saat ini"
+                                        />
 
-                                <InputError message={errors.current_password} />
-                            </div>
+                                        <InputError
+                                            message={errors.current_password}
+                                        />
+                                    </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password">New password</Label>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="password">
+                                            Password baru
+                                        </Label>
 
-                                <PasswordInput
-                                    id="password"
-                                    ref={passwordInput}
-                                    name="password"
-                                    className="mt-1 block w-full"
-                                    autoComplete="new-password"
-                                    placeholder="New password"
-                                    passwordrules={props.passwordRules}
-                                />
+                                        <PasswordInput
+                                            id="password"
+                                            ref={passwordInput}
+                                            name="password"
+                                            className="mt-1 block w-full rounded-xl"
+                                            autoComplete="new-password"
+                                            placeholder="Password baru"
+                                            passwordrules={props.passwordRules}
+                                        />
 
-                                <InputError message={errors.password} />
-                            </div>
+                                        <InputError message={errors.password} />
+                                    </div>
 
-                            <div className="grid gap-2">
-                                <Label htmlFor="password_confirmation">
-                                    Confirm password
-                                </Label>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="password_confirmation">
+                                            Konfirmasi password
+                                        </Label>
 
-                                <PasswordInput
-                                    id="password_confirmation"
-                                    name="password_confirmation"
-                                    className="mt-1 block w-full"
-                                    autoComplete="new-password"
-                                    placeholder="Confirm password"
-                                    passwordrules={props.passwordRules}
-                                />
+                                        <PasswordInput
+                                            id="password_confirmation"
+                                            name="password_confirmation"
+                                            className="mt-1 block w-full rounded-xl"
+                                            autoComplete="new-password"
+                                            placeholder="Ulangi password baru"
+                                            passwordrules={props.passwordRules}
+                                        />
 
-                                <InputError
-                                    message={errors.password_confirmation}
-                                />
-                            </div>
+                                        <InputError
+                                            message={
+                                                errors.password_confirmation
+                                            }
+                                        />
+                                    </div>
 
-                            <div className="flex items-center gap-4">
-                                <Button
-                                    disabled={processing}
-                                    data-test="update-password-button"
-                                >
-                                    Save
-                                </Button>
-                            </div>
-                        </>
-                    )}
-                </Form>
+                                    <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-3">
+                                        <ShieldCheck className="size-4 shrink-0 text-primary" />
+                                        <p className="text-xs text-muted-foreground">
+                                            Tips: kombinasikan huruf besar,
+                                            angka, dan simbol, serta jangan
+                                            pakai password yang sama di aplikasi
+                                            lain.
+                                        </p>
+                                    </div>
+
+                                    <div className="flex items-center gap-4 pt-1">
+                                        <Button
+                                            disabled={processing}
+                                            className="rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                                            data-test="update-password-button"
+                                        >
+                                            Simpan password
+                                        </Button>
+                                    </div>
+                                </>
+                            )}
+                        </Form>
+                    </CardContent>
+                </Card>
             </div>
         </>
     );
@@ -124,7 +166,7 @@ export default function Security(props: Props) {
 Security.layout = {
     breadcrumbs: [
         {
-            title: 'Security settings',
+            title: 'Keamanan',
             href: edit(),
         },
     ],

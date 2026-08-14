@@ -9,7 +9,7 @@ import {
     Legend,
     Filler,
 } from 'chart.js';
-import { Plus, Trash2 } from 'lucide-react';
+import { CalendarClock, Plus, Trash2 } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import { Button } from '@/components/ui/button';
 import {
@@ -22,7 +22,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDate, formatMoney, formatPercent } from '@/lib/format';
-import { toUrl } from '@/lib/utils';
+import { cn, toUrl } from '@/lib/utils';
 import { index } from '@/routes/savings-goals';
 import {
     store as storePayment,
@@ -56,6 +56,19 @@ export default function SavingsShow({ goal, payments }: Props) {
     const target = Number(goal.target_amount);
     const percent = target > 0 ? (paid / target) * 100 : 0;
     const reached = paid >= target;
+    const remaining = Math.max(target - paid, 0);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const end = goal.end_date ? new Date(`${goal.end_date}T00:00:00`) : null;
+    const missed = !reached && end !== null && end.getTime() < today.getTime();
+    const daysLeft = end
+        ? Math.max(Math.ceil((end.getTime() - today.getTime()) / 86_400_000), 0)
+        : 0;
+    const perDay =
+        !reached && !missed && end !== null && daysLeft > 0
+            ? Math.ceil(remaining / daysLeft)
+            : 0;
 
     const { data, setData, errors, processing, post, reset } =
         useForm<PaymentForm>({
@@ -134,8 +147,16 @@ export default function SavingsShow({ goal, payments }: Props) {
                                     Target tercapai, bagus!
                                 </CardDescription>
                             ) : (
-                                <CardDescription>
-                                    Kurang {formatMoney(target - paid)} lagi
+                                <CardDescription
+                                    className={
+                                        missed
+                                            ? 'font-medium text-destructive'
+                                            : undefined
+                                    }
+                                >
+                                    {missed
+                                        ? `Terlewat — kurang ${formatMoney(remaining)}`
+                                        : `Kurang ${formatMoney(remaining)} lagi`}
                                 </CardDescription>
                             )}
                         </CardHeader>
@@ -154,10 +175,39 @@ export default function SavingsShow({ goal, payments }: Props) {
                         </div>
                         <div className="h-3 overflow-hidden rounded-full bg-muted">
                             <div
-                                className="h-full rounded-full bg-primary transition-all duration-700"
+                                className={cn(
+                                    'h-full rounded-full transition-all duration-700',
+                                    reached
+                                        ? 'bg-emerald-500'
+                                        : missed
+                                          ? 'bg-destructive'
+                                          : 'bg-gradient-to-r from-primary to-primary/60',
+                                )}
                                 style={{ width: `${Math.min(percent, 100)}%` }}
                             />
                         </div>
+
+                        {!reached && perDay > 0 && (
+                            <div className="flex flex-wrap items-center gap-1.5 rounded-xl bg-primary/5 px-3 py-2.5 text-xs text-muted-foreground">
+                                <CalendarClock className="size-4 shrink-0 text-primary" />
+                                <span>
+                                    Butuh cicilan{' '}
+                                    <span className="font-semibold text-foreground">
+                                        ±{formatMoney(perDay)}
+                                    </span>
+                                    /hari ·{' '}
+                                    <span className="font-semibold text-foreground">
+                                        ±{formatMoney(perDay * 7)}
+                                    </span>
+                                    /minggu ·{' '}
+                                    <span className="font-semibold text-foreground">
+                                        ±{formatMoney(perDay * 30)}
+                                    </span>
+                                    /bulan sampai{' '}
+                                    {goal.end_date && formatDate(goal.end_date)}
+                                </span>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
 

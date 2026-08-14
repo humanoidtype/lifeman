@@ -46,6 +46,7 @@ class HandleInertiaRequests extends Middleware
                 'error' => fn () => $request->session()->get('error'),
             ],
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'appVersion' => json_decode((string) file_get_contents(base_path('package.json')), true)['version'] ?? 'dev',
         ];
     }
 }

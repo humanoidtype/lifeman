@@ -6,6 +6,7 @@ use Database\Factories\ReminderFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -61,6 +62,18 @@ class Reminder extends Model
     }
 
     /**
+     * Whether the reminder time has passed and it is still not done.
+     */
+    protected function isExpired(): Attribute
+    {
+        return Attribute::get(
+            fn (): bool => $this->remind_at !== null
+                && $this->remind_at->isPast()
+                && $this->done_at === null,
+        );
+    }
+
+    /**
      * @param  Builder<Reminder>  $query
      * @return Builder<Reminder>
      */
@@ -70,6 +83,18 @@ class Reminder extends Model
         return $query->whereNull('done_at')
             ->where('remind_at', '<=', now())
             ->whereNull('notified_at');
+    }
+
+    /**
+     * Reminders whose time has passed and are still not done.
+     *
+     * @param  Builder<Reminder>  $query
+     */
+    #[Scope]
+    protected function overdue(Builder $query): Builder
+    {
+        return $query->whereNull('done_at')
+            ->where('remind_at', '<=', now());
     }
 
     /**
