@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Enums\ReminderType;
 use App\Models\Reminder;
 use App\Models\SavingsGoal;
 use App\Models\SavingsPayment;
@@ -22,7 +21,6 @@ class DemoDataSeeder extends Seeder
 
         Reminder::create([
             'user_id' => $user->id,
-            'type' => ReminderType::Time,
             'title' => 'Minum air putih',
             'body' => 'Jangan lupa hidrasi, ya!',
             'remind_at' => now()->subMinutes(5),
@@ -30,7 +28,6 @@ class DemoDataSeeder extends Seeder
 
         Reminder::create([
             'user_id' => $user->id,
-            'type' => ReminderType::Time,
             'title' => 'Rapat tim sore',
             'body' => 'Siapkan bahan meeting.',
             'remind_at' => now()->addHours(3),
@@ -38,7 +35,6 @@ class DemoDataSeeder extends Seeder
 
         Reminder::create([
             'user_id' => $user->id,
-            'type' => ReminderType::Task,
             'title' => 'Kerjakan laporan bulanan',
             'body' => 'Serahkan sebelum hari Jumat.',
             'remind_at' => now()->endOfDay(),
