@@ -13,7 +13,7 @@ export function useBackHandler(): void {
             return;
         }
 
-        const offNavigate = router.on('navigate', (event) => {
+        const offClientVisit = router.on('clientVisit', (event) => {
             currentPage = event.detail.page;
         });
 
@@ -48,7 +48,7 @@ export function useBackHandler(): void {
         });
 
         return () => {
-            offNavigate();
+            offClientVisit();
             cancelled = true;
             handle?.remove();
         };
