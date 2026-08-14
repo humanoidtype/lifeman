@@ -21,6 +21,9 @@ git checkout "$BRANCH"
 git pull --ff-only origin "$BRANCH"
 composer install --no-dev --optimize-autoloader --no-interaction
 
+# Clear stale caches so wayfinder:generate (run by vite build) sees fresh routes
+php artisan optimize:clear
+
 # 2. Frontend
 npm ci
 npm run build
