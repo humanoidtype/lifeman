@@ -13,7 +13,7 @@ export function useBackHandler(): void {
             return;
         }
 
-        const offClientVisit = router.on('clientVisit', (event) => {
+        const offSuccess = router.on('success', (event) => {
             currentPage = event.detail.page;
         });
 
@@ -21,7 +21,7 @@ export function useBackHandler(): void {
         let cancelled = false;
 
         void App.addListener('backButton', ({ canGoBack }) => {
-            const url = currentPage?.url ?? window.location.pathname;
+            const url = window.location.pathname;
             const authenticated = Boolean(currentPage?.props.auth?.user);
 
             if (!authenticated) {
@@ -48,7 +48,7 @@ export function useBackHandler(): void {
         });
 
         return () => {
-            offClientVisit();
+            offSuccess();
             cancelled = true;
             handle?.remove();
         };
