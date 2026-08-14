@@ -1,4 +1,3 @@
-import type { Page, SharedPageProps } from '@inertiajs/core';
 import type { Auth } from '@/types/auth';
 
 declare module 'react' {
@@ -16,9 +15,5 @@ declare module '@inertiajs/core' {
             sidebarOpen: boolean;
             [key: string]: unknown;
         };
-    }
-
-    export interface Router {
-        page: Page<SharedPageProps>;
     }
 }
