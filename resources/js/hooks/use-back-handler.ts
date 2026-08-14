@@ -1,14 +1,10 @@
 import { App } from '@capacitor/app';
 import type { PluginListenerHandle } from '@capacitor/core';
-import { router, usePage } from '@inertiajs/react';
+import { router } from '@inertiajs/react';
 import { useEffect } from 'react';
 import { isNativePlatform } from '@/lib/notification';
 
 export function useBackHandler(): void {
-    const page = usePage();
-    const url = page.url;
-    const authenticated = Boolean(page.props.auth?.user);
-
     useEffect(() => {
         if (!isNativePlatform()) {
             return;
@@ -18,6 +14,8 @@ export function useBackHandler(): void {
         let cancelled = false;
 
         void App.addListener('backButton', ({ canGoBack }) => {
+            const authenticated = Boolean(router.page.props.auth?.user);
+
             if (!authenticated) {
                 if (canGoBack) {
                     window.history.back();
@@ -28,7 +26,7 @@ export function useBackHandler(): void {
                 return;
             }
 
-            if (url === '/dashboard') {
+            if (router.page.url === '/dashboard') {
                 void App.minimizeApp();
             } else {
                 void router.visit('/dashboard', { replace: true });
@@ -45,5 +43,5 @@ export function useBackHandler(): void {
             cancelled = true;
             handle?.remove();
         };
-    }, [url, authenticated]);
+    }, []);
 }
