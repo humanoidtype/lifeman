@@ -63,6 +63,8 @@ class Reminder extends Model
 
     /**
      * Whether the reminder time has passed and it is still not done.
+     *
+     * @return Attribute<bool, never>
      */
     protected function isExpired(): Attribute
     {
@@ -89,6 +91,7 @@ class Reminder extends Model
      * Reminders whose time has passed and are still not done.
      *
      * @param  Builder<Reminder>  $query
+     * @return Builder<Reminder>
      */
     #[Scope]
     protected function overdue(Builder $query): Builder

@@ -123,4 +123,20 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Native App Access
+    |--------------------------------------------------------------------------
+    |
+    | The application is only meant to be accessed through the native
+    | Capacitor WebView. Requests coming from a regular browser are
+    | redirected to the landing page. During development, access can be
+    | allowed for any user agent by setting the flag below.
+    |
+    */
+
+    'web_access_allowed' => env('WEB_ACCESS_ALLOWED', false),
+
+    'web_redirect_url' => env('WEB_REDIRECT_URL', 'https://lxx.my.id'),
+
 ];
