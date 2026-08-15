@@ -14,7 +14,7 @@ test('regular browsers are redirected to the landing page', function () {
 });
 
 test('native app user agents can access the application', function () {
-    $this->withHeader('User-Agent', 'Mozilla/5.0 (Linux; Android 14) Chrome/120.0 Mobile Safari/537.36 Capacitor/8.5.0')
+    $this->withHeader('User-Agent', 'Mozilla/5.0 (Linux; Android 14) Chrome/120.0 Mobile Safari/537.36 LIFEMAN_APP')
         ->get('/')
         ->assertOk();
 });

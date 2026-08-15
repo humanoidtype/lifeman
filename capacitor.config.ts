@@ -4,6 +4,7 @@ const config: CapacitorConfig = {
     appId: 'com.lifeman.app',
     appName: 'Life Man',
     webDir: 'public',
+    appendUserAgent: 'LIFEMAN_APP',
     server: {
         url: process.env.LIFEMAN_APP_URL ?? 'http://localhost:8000',
         cleartext: false,

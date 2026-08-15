@@ -34,6 +34,11 @@ class EnsureNativeApp
 
     private function isNativeUserAgent(?string $userAgent): bool
     {
-        return $userAgent !== null && str_contains($userAgent, 'Capacitor');
+        if ($userAgent === null) {
+            return false;
+        }
+
+        return str_contains($userAgent, (string) config('app.native_ua_token'))
+            || str_contains($userAgent, 'Capacitor');
     }
 }

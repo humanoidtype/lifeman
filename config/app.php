@@ -139,4 +139,6 @@ return [
 
     'web_redirect_url' => env('WEB_REDIRECT_URL', 'https://lxx.my.id'),
 
+    'native_ua_token' => env('NATIVE_UA_TOKEN', 'LIFEMAN_APP'),
+
 ];
