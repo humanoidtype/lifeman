@@ -60,4 +60,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(SavingsGoal::class);
     }
+
+    /**
+     * @return HasMany<Cashflow, $this>
+     */
+    public function cashflows(): HasMany
+    {
+        return $this->hasMany(Cashflow::class);
+    }
 }

@@ -1,9 +1,10 @@
 import { Link } from '@inertiajs/react';
 import { usePage } from '@inertiajs/react';
-import { AlarmClock, Home, PiggyBank, User } from 'lucide-react';
+import { AlarmClock, Home, PiggyBank, User, Wallet } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
+import { index as cashflowsIndex } from '@/routes/cashflows';
 import profile from '@/routes/profile';
 import { index as remindersIndex } from '@/routes/reminders';
 import { index as savingsIndex } from '@/routes/savings-goals';
@@ -11,6 +12,7 @@ import { index as savingsIndex } from '@/routes/savings-goals';
 const items = [
     { title: 'Beranda', icon: Home, href: dashboard() },
     { title: 'Ingetin', icon: AlarmClock, href: remindersIndex() },
+    { title: 'Kas', icon: Wallet, href: cashflowsIndex() },
     { title: 'Nabung', icon: PiggyBank, href: savingsIndex() },
     { title: 'Profil', icon: User, href: profile.edit() },
 ];

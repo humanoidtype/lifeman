@@ -17,7 +17,10 @@ class DatabaseSeeder extends Seeder
     {
         User::query()->firstOrCreate(
             ['email' => 'test@example.com'],
-            ['name' => 'Test User'],
+            [
+                'name' => 'Test User',
+                'password' => 'password',
+            ],
         );
 
         $this->call(DemoDataSeeder::class);

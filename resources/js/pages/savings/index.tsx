@@ -1,6 +1,8 @@
 import { Head, Link, useForm } from '@inertiajs/react';
 import { ArrowRight, CalendarClock, PiggyBank, Plus } from 'lucide-react';
 import { useState } from 'react';
+import { FilterBar } from '@/components/filter-bar';
+import { Pagination } from '@/components/pagination';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -16,11 +18,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDate, formatMoney, formatPercent } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
-import { show, store } from '@/routes/savings-goals';
+import { show, store, index } from '@/routes/savings-goals';
 import type { PaginatedData, SavingsGoal } from '@/types';
 
 type Props = {
     goals: PaginatedData<SavingsGoal>;
+    filters: {
+        search: string;
+        status: string;
+        sort: string;
+        dir: string;
+    };
 };
 
 type GoalForm = {
@@ -31,7 +39,7 @@ type GoalForm = {
     notes: string;
 };
 
-export default function SavingsIndex({ goals }: Props) {
+export default function SavingsIndex({ goals, filters }: Props) {
     const [open, setOpen] = useState(false);
 
     return (
@@ -54,10 +62,27 @@ export default function SavingsIndex({ goals }: Props) {
                     </Button>
                 </div>
 
+                <FilterBar
+                    url={toUrl(index())}
+                    search={filters.search}
+                    status={filters.status}
+                    sort={filters.sort}
+                    statusOptions={[
+                        { value: 'active', label: 'Berjalan' },
+                        { value: 'completed', label: 'Tercapai' },
+                    ]}
+                    sortOptions={[
+                        { value: 'created_at', label: 'Dibuat' },
+                        { value: 'target_amount', label: 'Target' },
+                        { value: 'end_date', label: 'Batas waktu' },
+                        { value: 'title', label: 'Judul' },
+                    ]}
+                />
+
                 <div className="grid gap-4 sm:grid-cols-2">
                     {goals.data.length === 0 && (
                         <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
-                            Belum ada target nabung. Buat target pertamamu.
+                            Tidak ada target nabung yang cocok.
                         </p>
                     )}
 
@@ -65,6 +90,8 @@ export default function SavingsIndex({ goals }: Props) {
                         <GoalCard key={goal.id} goal={goal} />
                     ))}
                 </div>
+
+                <Pagination links={goals.links} />
             </div>
 
             <GoalFormDialog open={open} onOpenChange={setOpen} />

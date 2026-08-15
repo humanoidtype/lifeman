@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\SavingsGoal;
+use App\Models\SavingsPayment;
 use App\Models\User;
 
 test('guests are redirected to the login page', function () {
@@ -17,6 +18,43 @@ test('authenticated users can list their savings goals', function () {
         ->assertInertia(fn ($page) => $page
             ->component('savings/index')
             ->has('goals.data', 2));
+});
+
+test('savings goals can be searched and filtered by status', function () {
+    $user = User::factory()->create();
+    $active = SavingsGoal::factory()->for($user)->create([
+        'title' => 'Ganti HP Baru',
+        'target_amount' => 5_000_000,
+        'end_date' => now()->addDays(60)->toDateString(),
+    ]);
+    $done = SavingsGoal::factory()->reached()->for($user)->create([
+        'title' => 'Liburan Bali',
+        'target_amount' => 3_000_000,
+        'end_date' => now()->subDay()->toDateString(),
+    ]);
+    SavingsPayment::factory()->for($done)->create(['amount' => 3_000_000]);
+
+    $this->actingAs($user);
+
+    $this->get(route('savings-goals.index', ['search' => 'HP']))
+        ->assertInertia(fn ($page) => $page
+            ->has('goals.data', 1)
+            ->where('goals.data.0.title', 'Ganti HP Baru')
+            ->where('filters.search', 'HP'));
+
+    $this->get(route('savings-goals.index', ['status' => 'completed']))
+        ->assertInertia(fn ($page) => $page
+            ->has('goals.data', 1)
+            ->where('goals.data.0.title', 'Liburan Bali'));
+
+    $this->get(route('savings-goals.index', ['status' => 'active']))
+        ->assertInertia(fn ($page) => $page
+            ->has('goals.data', 1)
+            ->where('goals.data.0.id', $active->id));
+
+    $this->get(route('savings-goals.index', ['sort' => 'title', 'dir' => 'asc']))
+        ->assertInertia(fn ($page) => $page
+            ->where('goals.data.0.title', 'Ganti HP Baru'));
 });
 
 test('users can create a savings goal', function () {

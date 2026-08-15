@@ -9,7 +9,8 @@ import {
     Legend,
     Filler,
 } from 'chart.js';
-import { CalendarClock, Plus, Trash2 } from 'lucide-react';
+import { CalendarClock, Pencil, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 import { Line } from 'react-chartjs-2';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +20,13 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Dialog,
+    DialogContent,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDate, formatMoney, formatPercent } from '@/lib/format';
@@ -26,6 +34,7 @@ import { cn, toUrl } from '@/lib/utils';
 import { index } from '@/routes/savings-goals';
 import {
     store as storePayment,
+    update as updatePayment,
     destroy as destroyPayment,
 } from '@/routes/savings-payments';
 import type { SavingsGoal, SavingsPayment } from '@/types';
@@ -57,6 +66,7 @@ export default function SavingsShow({ goal, payments }: Props) {
     const percent = target > 0 ? (paid / target) * 100 : 0;
     const reached = paid >= target;
     const remaining = Math.max(target - paid, 0);
+    const [editing, setEditing] = useState<SavingsPayment | null>(null);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -355,6 +365,13 @@ export default function SavingsShow({ goal, payments }: Props) {
                                     <Button
                                         size="icon"
                                         variant="ghost"
+                                        onClick={() => setEditing(payment)}
+                                    >
+                                        <Pencil className="size-4" />
+                                    </Button>
+                                    <Button
+                                        size="icon"
+                                        variant="ghost"
                                         onClick={() => removePayment(payment)}
                                     >
                                         <Trash2 className="size-4 text-destructive" />
@@ -364,8 +381,108 @@ export default function SavingsShow({ goal, payments }: Props) {
                         </CardContent>
                     </Card>
                 )}
+
+                {editing && (
+                    <EditPaymentDialog
+                        payment={editing}
+                        onClose={() => setEditing(null)}
+                    />
+                )}
             </div>
         </>
+    );
+}
+
+function EditPaymentDialog({
+    payment,
+    onClose,
+}: {
+    payment: SavingsPayment;
+    onClose: () => void;
+}) {
+    const { data, setData, errors, processing, patch } = useForm<PaymentForm>({
+        amount: String(Number(payment.amount)),
+        paid_at: payment.paid_at,
+        note: payment.note ?? '',
+    });
+
+    function submit(): void {
+        patch(toUrl(updatePayment({ savings_payment: payment.id })), {
+            onSuccess: onClose,
+        });
+    }
+
+    return (
+        <Dialog open onOpenChange={onClose}>
+            <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                    <DialogTitle>Edit Cicilan</DialogTitle>
+                </DialogHeader>
+
+                <div className="grid gap-4 py-2">
+                    <div className="grid gap-2">
+                        <Label htmlFor="edit-amount">Nominal</Label>
+                        <Input
+                            id="edit-amount"
+                            type="number"
+                            min="1"
+                            inputMode="numeric"
+                            value={data.amount}
+                            onChange={(event) =>
+                                setData('amount', event.target.value)
+                            }
+                        />
+                        {errors.amount && (
+                            <p className="text-sm text-destructive">
+                                {errors.amount}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="edit-date">Tanggal</Label>
+                        <Input
+                            id="edit-date"
+                            type="date"
+                            value={data.paid_at}
+                            onChange={(event) =>
+                                setData('paid_at', event.target.value)
+                            }
+                        />
+                        {errors.paid_at && (
+                            <p className="text-sm text-destructive">
+                                {errors.paid_at}
+                            </p>
+                        )}
+                    </div>
+
+                    <div className="grid gap-2">
+                        <Label htmlFor="edit-note">Catatan (opsional)</Label>
+                        <Input
+                            id="edit-note"
+                            value={data.note}
+                            onChange={(event) =>
+                                setData('note', event.target.value)
+                            }
+                        />
+                        {errors.note && (
+                            <p className="text-sm text-destructive">
+                                {errors.note}
+                            </p>
+                        )}
+                    </div>
+                </div>
+
+                <DialogFooter>
+                    <Button variant="outline" onClick={onClose}>
+                        Batal
+                    </Button>
+                    <Button onClick={submit} disabled={processing}>
+                        Simpan
+                    </Button>
+                </DialogFooter>
+            </DialogContent>
+        </Dialog>
     );
 }
 

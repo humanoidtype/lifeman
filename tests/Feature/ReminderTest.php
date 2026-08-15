@@ -20,6 +20,35 @@ test('authenticated users can list their reminders', function () {
             ->has('reminders.data', 3));
 });
 
+test('reminders can be searched and filtered by status', function () {
+    $user = User::factory()->create();
+    Reminder::factory()->for($user)->create(['title' => 'Minum obat', 'remind_at' => now()->addDay()]);
+    Reminder::factory()->for($user)->create(['title' => 'Rapat tim', 'remind_at' => now()->addDay(), 'done_at' => now()]);
+    Reminder::factory()->for($user)->create(['title' => 'Bayar tagihan', 'remind_at' => now()->subDay()]);
+
+    $this->actingAs($user);
+
+    $this->get(route('reminders.index', ['search' => 'obat']))
+        ->assertInertia(fn ($page) => $page
+            ->has('reminders.data', 1)
+            ->where('reminders.data.0.title', 'Minum obat')
+            ->where('filters.search', 'obat'));
+
+    $this->get(route('reminders.index', ['status' => 'done']))
+        ->assertInertia(fn ($page) => $page
+            ->has('reminders.data', 1)
+            ->where('reminders.data.0.title', 'Rapat tim'));
+
+    $this->get(route('reminders.index', ['status' => 'overdue']))
+        ->assertInertia(fn ($page) => $page
+            ->has('reminders.data', 1)
+            ->where('reminders.data.0.title', 'Bayar tagihan'));
+
+    $this->get(route('reminders.index', ['sort' => 'title', 'dir' => 'asc']))
+        ->assertInertia(fn ($page) => $page
+            ->where('reminders.data.0.title', 'Bayar tagihan'));
+});
+
 test('users can create a reminder', function () {
     $user = User::factory()->create();
 

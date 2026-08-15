@@ -1,7 +1,7 @@
 import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
-const SHOW_DELAY_MS = 150;
+const SHOW_DELAY_MS = 400;
 
 export function LoadingOverlay() {
     const [visible, setVisible] = useState(false);
@@ -36,11 +36,11 @@ export function LoadingOverlay() {
 
     return (
         <div
-            role="status"
+            role="progressbar"
             aria-label="Memuat"
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-background/60 backdrop-blur-sm"
+            className="fixed inset-x-0 top-0 z-[100] h-0.5 overflow-hidden"
         >
-            <div className="size-10 animate-spin rounded-full border-2 border-primary/30 border-t-primary" />
+            <div className="h-full w-1/3 animate-[loading-slide_1s_ease-in-out_infinite] rounded-full bg-primary shadow-sm shadow-primary/40" />
         </div>
     );
 }

@@ -44,6 +44,36 @@ test('users cannot add payments to goals of other users', function () {
         ->assertForbidden();
 });
 
+test('users can update their own payment but not others', function () {
+    $user = User::factory()->create();
+    $other = User::factory()->create();
+    $payment = SavingsPayment::factory()->for(
+        SavingsGoal::factory()->for($user)
+    )->create();
+    $otherPayment = SavingsPayment::factory()->for(
+        SavingsGoal::factory()->for($other)
+    )->create();
+
+    $this->actingAs($user);
+    $this->patch(route('savings-payments.update', $payment), [
+        'amount' => 750_000,
+        'note' => 'Diubah',
+    ])->assertRedirect();
+    $this->patch(route('savings-payments.update', $otherPayment), [
+        'amount' => 1,
+    ])->assertForbidden();
+
+    $this->assertDatabaseHas('savings_payments', [
+        'id' => $payment->id,
+        'amount' => '750000.00',
+        'note' => 'Diubah',
+    ]);
+    $this->assertDatabaseHas('savings_payments', [
+        'id' => $otherPayment->id,
+        'amount' => $otherPayment->amount,
+    ]);
+});
+
 test('users can delete their own payment but not others', function () {
     $user = User::factory()->create();
     $other = User::factory()->create();

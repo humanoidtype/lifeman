@@ -20,6 +20,8 @@ use Illuminate\Support\Carbon;
  * @property Carbon $start_date
  * @property Carbon|null $end_date
  * @property string|null $notes
+ * @property-read float|int|string|null $paid_amount
+ * @property-read int|null $payments_count
  * @property Carbon|null $created_at
  * @property Carbon|null $updated_at
  */

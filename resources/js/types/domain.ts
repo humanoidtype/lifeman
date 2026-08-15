@@ -36,9 +36,36 @@ export type SavingsPayment = {
     note: string | null;
 };
 
+export type Cashflow = {
+    id: number;
+    title: string;
+    period_start: string | null;
+    period_end: string | null;
+    notes: string | null;
+    income_total?: string | null;
+    expense_total?: string | null;
+    created_at: string;
+};
+
+export type CashflowItem = {
+    id: number;
+    cashflow_id: number;
+    type: 'income' | 'expense';
+    name: string;
+    amount: string;
+    quantity: number;
+    created_at: string;
+};
+
+export type PaginationLink = {
+    url: string | null;
+    label: string;
+    active: boolean;
+};
+
 export type PaginatedData<T> = {
     data: T[];
-    links: Record<string, string | null>;
+    links: PaginationLink[];
     current_page: number;
     last_page: number;
     total: number;

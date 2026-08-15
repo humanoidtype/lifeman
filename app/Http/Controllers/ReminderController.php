@@ -16,12 +16,43 @@ class ReminderController extends Controller
 {
     public function index(Request $request): Response
     {
+        $query = Reminder::query()->whereBelongsTo(auth()->user());
+
+        $search = $request->string('search')->trim()->toString();
+
+        if ($search !== '') {
+            $query->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('body', 'like', "%{$search}%");
+            });
+        }
+
+        $status = $request->string('status')->toString();
+
+        match ($status) {
+            'pending' => $query->pending(),
+            'done' => $query->whereNotNull('done_at'),
+            'overdue' => $query->overdue(),
+            default => null,
+        };
+
+        $sort = $request->string('sort')->toString();
+        $dir = $request->string('dir', 'desc')->toString() === 'asc' ? 'asc' : 'desc';
+
+        if (in_array($sort, ['remind_at', 'created_at', 'title', 'done_at'], true)) {
+            $query->orderBy($sort, $dir);
+        } else {
+            $query->orderByRaw('done_at IS NULL DESC')->latest('remind_at');
+        }
+
         return Inertia::render('reminders/index', [
-            'reminders' => Reminder::query()
-                ->whereBelongsTo(auth()->user())
-                ->orderByRaw('done_at IS NULL DESC')
-                ->latest('remind_at')
-                ->paginate(20),
+            'reminders' => $query->paginate(20)->withQueryString(),
+            'filters' => [
+                'search' => $search,
+                'status' => $status,
+                'sort' => $sort,
+                'dir' => $dir,
+            ],
         ]);
     }
 

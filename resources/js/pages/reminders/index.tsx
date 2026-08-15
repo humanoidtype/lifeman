@@ -9,6 +9,8 @@ import {
     Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
+import { FilterBar } from '@/components/filter-bar';
+import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import {
@@ -23,11 +25,17 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { formatDateTime } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
-import { store, update, destroy, done } from '@/routes/reminders';
+import { store, update, destroy, done, index } from '@/routes/reminders';
 import type { PaginatedData, Reminder } from '@/types';
 
 type Props = {
     reminders: PaginatedData<Reminder>;
+    filters: {
+        search: string;
+        status: string;
+        sort: string;
+        dir: string;
+    };
 };
 
 type ReminderForm = {
@@ -47,7 +55,7 @@ function toDateTimeLocal(value: string | null | undefined): string {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
-export default function RemindersIndex({ reminders }: Props) {
+export default function RemindersIndex({ reminders, filters }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editing, setEditing] = useState<Reminder | null>(null);
 
@@ -71,10 +79,28 @@ export default function RemindersIndex({ reminders }: Props) {
                     </Button>
                 </div>
 
+                <FilterBar
+                    url={toUrl(index())}
+                    search={filters.search}
+                    status={filters.status}
+                    sort={filters.sort}
+                    statusOptions={[
+                        { value: 'pending', label: 'Aktif' },
+                        { value: 'done', label: 'Selesai' },
+                        { value: 'overdue', label: 'Terlewat' },
+                    ]}
+                    sortOptions={[
+                        { value: 'remind_at', label: 'Waktu' },
+                        { value: 'created_at', label: 'Dibuat' },
+                        { value: 'title', label: 'Judul' },
+                        { value: 'done_at', label: 'Selesai' },
+                    ]}
+                />
+
                 <div className="flex flex-col gap-3">
                     {reminders.data.length === 0 && (
                         <p className="py-10 text-center text-sm text-muted-foreground">
-                            Belum ada ingetin. Tambahkan yang baru untuk mulai.
+                            Tidak ada ingetin yang cocok.
                         </p>
                     )}
 
@@ -86,6 +112,8 @@ export default function RemindersIndex({ reminders }: Props) {
                         />
                     ))}
                 </div>
+
+                <Pagination links={reminders.links} />
             </div>
 
             <ReminderFormDialog

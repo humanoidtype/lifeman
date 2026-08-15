@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Cashflow;
+use App\Models\CashflowItem;
 use App\Models\Reminder;
 use App\Models\SavingsGoal;
 use App\Models\SavingsPayment;
@@ -76,6 +78,20 @@ class DemoDataSeeder extends Seeder
         $this->payment($liburan, 1_000_000, now()->subMonths(2));
         $this->payment($liburan, 1_000_000, now()->subMonth()->addDays(3));
         $this->payment($liburan, 1_000_000, now()->subWeeks(2));
+
+        $kas = Cashflow::create([
+            'user_id' => $user->id,
+            'title' => 'Bulan '.now()->format('F Y'),
+            'period_start' => now()->startOfMonth()->toDateString(),
+            'period_end' => now()->endOfMonth()->toDateString(),
+            'notes' => 'Catatan keuangan bulan berjalan.',
+        ]);
+
+        $this->item($kas, CashflowItem::TYPE_INCOME, 'Gaji bulanan', 4_500_000, 1);
+        $this->item($kas, CashflowItem::TYPE_EXPENSE, 'Kos', 750_000, 1);
+        $this->item($kas, CashflowItem::TYPE_EXPENSE, 'Kebutuhan bulanan', 850_000, 1);
+        $this->item($kas, CashflowItem::TYPE_EXPENSE, 'Bensin motor', 100_000, 2);
+        $this->item($kas, CashflowItem::TYPE_EXPENSE, 'Wifi & pulsa', 300_000, 1);
     }
 
     private function payment(SavingsGoal $goal, int $amount, CarbonInterface $paidAt): void
@@ -85,6 +101,17 @@ class DemoDataSeeder extends Seeder
             'amount' => $amount,
             'paid_at' => $paidAt->toDateString(),
             'note' => null,
+        ]);
+    }
+
+    private function item(Cashflow $cashflow, string $type, string $name, int $amount, int $quantity): void
+    {
+        CashflowItem::create([
+            'cashflow_id' => $cashflow->id,
+            'type' => $type,
+            'name' => $name,
+            'amount' => $amount,
+            'quantity' => $quantity,
         ]);
     }
 }
