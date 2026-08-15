@@ -51,6 +51,16 @@ jobs:
             - name: Sync Capacitor
               run: npx cap sync android
 
+            - name: Cache Gradle dependencies
+              uses: actions/cache@v4
+              with:
+                  path: |
+                      ~/.gradle/caches
+                      ~/.gradle/wrapper
+                  key: gradle-${{ hashFiles('package-lock.json') }}
+                  restore-keys: |
+                      gradle-
+
             - name: Bundle notification sounds
               run: mkdir -p android/app/src/main/res/raw && cp public/sounds/*.wav android/app/src/main/res/raw/
 
