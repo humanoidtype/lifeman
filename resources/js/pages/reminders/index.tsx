@@ -23,9 +23,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useNavigating } from '@/hooks/use-navigating';
-import { useRefreshing } from '@/hooks/use-refreshing';
 import { formatDateTime } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
 import { store, update, destroy, done, index } from '@/routes/reminders';
@@ -61,9 +58,6 @@ function toDateTimeLocal(value: string | null | undefined): string {
 export default function RemindersIndex({ reminders, filters }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editing, setEditing] = useState<Reminder | null>(null);
-    const { refreshing } = useRefreshing();
-    const navigating = useNavigating();
-    const loading = refreshing || navigating;
 
     return (
         <>
@@ -104,35 +98,25 @@ export default function RemindersIndex({ reminders, filters }: Props) {
                 />
 
                 <div className="flex flex-col gap-3">
-                    {loading ? (
-                        <ReminderSkeletonList />
-                    ) : (
-                        <>
-                            {reminders.data.length === 0 && (
-                                <p className="py-10 text-center text-sm text-muted-foreground">
-                                    Tidak ada ingetin yang cocok.
-                                </p>
-                            )}
+                    <>
+                        {reminders.data.length === 0 && (
+                            <p className="py-10 text-center text-sm text-muted-foreground">
+                                Tidak ada ingetin yang cocok.
+                            </p>
+                        )}
 
-                            {reminders.data.map((reminder) => (
-                                <ReminderCard
-                                    key={reminder.id}
-                                    reminder={reminder}
-                                    onEdit={() => setEditing(reminder)}
-                                />
-                            ))}
-                        </>
-                    )}
+                        {reminders.data.map((reminder) => (
+                            <ReminderCard
+                                key={reminder.id}
+                                reminder={reminder}
+                                onEdit={() => setEditing(reminder)}
+                            />
+                        ))}
+                    </>
                 </div>
 
                 <Pagination links={reminders.links} />
             </div>
-
-            {refreshing && (
-                <div className="sr-only" role="status" aria-live="polite">
-                    Memperbarui data...
-                </div>
-            )}
 
             <ReminderFormDialog
                 open={createOpen}
@@ -149,28 +133,6 @@ export default function RemindersIndex({ reminders, filters }: Props) {
                 title="Ubah Ingetin"
                 description="Perbarui detail pengingat."
             />
-        </>
-    );
-}
-
-function ReminderSkeletonList() {
-    return (
-        <>
-            {Array.from({ length: 5 }, (_, index) => (
-                <Card key={index} className="border-border/60">
-                    <CardContent className="flex items-center gap-3 p-4">
-                        <Skeleton className="size-9 shrink-0 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                            <Skeleton className="h-4 w-2/3" />
-                            <Skeleton className="h-3 w-1/2" />
-                        </div>
-                        <div className="flex shrink-0 gap-1">
-                            <Skeleton className="size-8 rounded-md" />
-                            <Skeleton className="size-8 rounded-md" />
-                        </div>
-                    </CardContent>
-                </Card>
-            ))}
         </>
     );
 }

@@ -2,7 +2,6 @@ import { Head, router, useForm } from '@inertiajs/react';
 import { Minus, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { NettoBadge } from '@/components/netto-badge';
-import { ShowPageSkeleton } from '@/components/page-skeletons';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -20,7 +19,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigating } from '@/hooks/use-navigating';
 import { formatDate, formatMoney } from '@/lib/format';
 import { toUrl } from '@/lib/utils';
 import {
@@ -65,12 +63,6 @@ export default function CashflowsShow({ cashflow, items }: Props) {
     const netto = incomeTotal - expenseTotal;
 
     const [editing, setEditing] = useState<CashflowItem | null>(null);
-
-    const navigating = useNavigating();
-
-    if (navigating) {
-        return <ShowPageSkeleton />;
-    }
 
     return (
         <>

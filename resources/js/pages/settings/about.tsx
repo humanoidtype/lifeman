@@ -6,17 +6,15 @@ import {
     ExternalLink,
     Heart,
     Info,
+    LoaderCircle,
     RefreshCw,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import Heading from '@/components/heading';
-import { SettingsPageSkeleton } from '@/components/page-skeletons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useNavigating } from '@/hooks/use-navigating';
 import { checkForUpdates } from '@/lib/update-check';
 import type { UpdateInfo } from '@/lib/update-check';
 
@@ -50,12 +48,6 @@ export default function About() {
             cancelled = true;
         };
     }, [appVersion]);
-
-    const navigating = useNavigating();
-
-    if (navigating) {
-        return <SettingsPageSkeleton />;
-    }
 
     function recheck(): void {
         setChecking(true);
@@ -141,10 +133,9 @@ export default function About() {
                     </CardHeader>
                     <CardContent className="space-y-4 p-5">
                         {checking ? (
-                            <div className="space-y-3">
-                                <Skeleton className="h-4 w-3/4" />
-                                <Skeleton className="h-4 w-1/2" />
-                                <Skeleton className="h-10 w-40" />
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                                <LoaderCircle className="size-4 animate-spin" />
+                                Memeriksa pembaruan...
                             </div>
                         ) : update?.failed ? (
                             <div className="space-y-3">

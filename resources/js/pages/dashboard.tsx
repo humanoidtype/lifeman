@@ -28,9 +28,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
-import { useNavigating } from '@/hooks/use-navigating';
-import { useRefreshing } from '@/hooks/use-refreshing';
 import { formatMoney } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
@@ -78,9 +75,6 @@ type Props = {
 
 export default function Dashboard({ auth, stats, charts }: Props) {
     const firstName = auth.user.name.split(' ')[0];
-    const { refreshing } = useRefreshing();
-    const navigating = useNavigating();
-    const loading = refreshing || navigating;
     const today = new Date().toLocaleDateString('id-ID', {
         weekday: 'long',
         day: 'numeric',
@@ -144,96 +138,92 @@ export default function Dashboard({ auth, stats, charts }: Props) {
                     </div>
                 </div>
 
-                {loading ? (
-                    <StatSkeletonGrid />
-                ) : (
-                    <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-                        <Card
-                            className={cn(
-                                'h-full',
-                                stats.overdueReminders > 0 &&
-                                    'border-destructive/40 bg-destructive/5',
-                            )}
-                        >
-                            <CardHeader className="pb-2">
-                                <div className="mb-2 flex items-center justify-between">
-                                    <div
-                                        className={cn(
-                                            'flex size-9 items-center justify-center rounded-xl',
-                                            stats.overdueReminders > 0
-                                                ? 'bg-destructive/10 text-destructive'
-                                                : 'bg-primary/10 text-primary',
-                                        )}
-                                    >
-                                        <AlarmClock className="size-4" />
-                                    </div>
-                                    {stats.overdueReminders > 0 && (
-                                        <Badge
-                                            variant="destructive"
-                                            className="font-medium"
-                                        >
-                                            {stats.overdueReminders} terlewat
-                                        </Badge>
+                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                    <Card
+                        className={cn(
+                            'h-full',
+                            stats.overdueReminders > 0 &&
+                                'border-destructive/40 bg-destructive/5',
+                        )}
+                    >
+                        <CardHeader className="pb-2">
+                            <div className="mb-2 flex items-center justify-between">
+                                <div
+                                    className={cn(
+                                        'flex size-9 items-center justify-center rounded-xl',
+                                        stats.overdueReminders > 0
+                                            ? 'bg-destructive/10 text-destructive'
+                                            : 'bg-primary/10 text-primary',
                                     )}
+                                >
+                                    <AlarmClock className="size-4" />
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Ingetin aktif
-                                </p>
-                                <CardTitle className="text-3xl">
-                                    {stats.pendingReminders}
-                                </CardTitle>
-                            </CardHeader>
-                        </Card>
-                        <Card className="h-full">
-                            <CardHeader className="pb-2">
-                                <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
-                                    <Target className="size-4" />
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Target nabung aktif
-                                </p>
-                                <CardTitle className="text-3xl">
-                                    {stats.activeGoals}
-                                </CardTitle>
-                            </CardHeader>
-                        </Card>
-                        <Card className="h-full">
-                            <CardHeader className="pb-2">
-                                <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
-                                    <Wallet className="size-4" />
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Total terkumpul
-                                </p>
-                                <CardTitle className="text-3xl">
-                                    {formatMoney(stats.savedAmount)}
-                                </CardTitle>
-                            </CardHeader>
-                        </Card>
-                        <Card className="h-full">
-                            <CardHeader className="pb-2">
-                                <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
-                                    <Wallet className="size-4" />
-                                </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Netto kas terakhir
-                                </p>
-                                <CardTitle className="text-3xl">
-                                    {stats.latestCashflow
-                                        ? formatMoney(cashflowNetto)
-                                        : '—'}
-                                </CardTitle>
-                                {stats.latestCashflow ? (
-                                    <NettoBadge netto={cashflowNetto} />
-                                ) : (
-                                    <CardDescription className="text-xs">
-                                        Belum ada catatan kas
-                                    </CardDescription>
+                                {stats.overdueReminders > 0 && (
+                                    <Badge
+                                        variant="destructive"
+                                        className="font-medium"
+                                    >
+                                        {stats.overdueReminders} terlewat
+                                    </Badge>
                                 )}
-                            </CardHeader>
-                        </Card>
-                    </div>
-                )}
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                                Ingetin aktif
+                            </p>
+                            <CardTitle className="text-3xl">
+                                {stats.pendingReminders}
+                            </CardTitle>
+                        </CardHeader>
+                    </Card>
+                    <Card className="h-full">
+                        <CardHeader className="pb-2">
+                            <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                                <Target className="size-4" />
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                                Target nabung aktif
+                            </p>
+                            <CardTitle className="text-3xl">
+                                {stats.activeGoals}
+                            </CardTitle>
+                        </CardHeader>
+                    </Card>
+                    <Card className="h-full">
+                        <CardHeader className="pb-2">
+                            <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                                <Wallet className="size-4" />
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                                Total terkumpul
+                            </p>
+                            <CardTitle className="text-3xl">
+                                {formatMoney(stats.savedAmount)}
+                            </CardTitle>
+                        </CardHeader>
+                    </Card>
+                    <Card className="h-full">
+                        <CardHeader className="pb-2">
+                            <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                                <Wallet className="size-4" />
+                            </div>
+                            <p className="text-sm text-muted-foreground">
+                                Netto kas terakhir
+                            </p>
+                            <CardTitle className="text-3xl">
+                                {stats.latestCashflow
+                                    ? formatMoney(cashflowNetto)
+                                    : '—'}
+                            </CardTitle>
+                            {stats.latestCashflow ? (
+                                <NettoBadge netto={cashflowNetto} />
+                            ) : (
+                                <CardDescription className="text-xs">
+                                    Belum ada catatan kas
+                                </CardDescription>
+                            )}
+                        </CardHeader>
+                    </Card>
+                </div>
 
                 <div className="grid gap-3 sm:grid-cols-2">
                     <FeatureCard
@@ -275,198 +265,188 @@ export default function Dashboard({ auth, stats, charts }: Props) {
                     />
                 </div>
 
-                {loading ? (
-                    <ChartSkeletonGrid />
-                ) : (
-                    (charts.goalsProgress.length > 0 ||
-                        hasSavings ||
-                        hasCompleted) && (
-                        <div className="grid gap-3 lg:grid-cols-2">
-                            {charts.goalsProgress.length > 0 && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-base">
-                                            Progress Nabung
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="h-64">
-                                            <Bar
-                                                data={{
-                                                    labels: charts.goalsProgress.map(
-                                                        (goal) => goal.title,
-                                                    ),
-                                                    datasets: [
-                                                        {
-                                                            label: 'Terkumpul',
-                                                            data: charts.goalsProgress.map(
+                {(charts.goalsProgress.length > 0 ||
+                    hasSavings ||
+                    hasCompleted) && (
+                    <div className="grid gap-3 lg:grid-cols-2">
+                        {charts.goalsProgress.length > 0 && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base">
+                                        Progress Nabung
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="h-64">
+                                        <Bar
+                                            data={{
+                                                labels: charts.goalsProgress.map(
+                                                    (goal) => goal.title,
+                                                ),
+                                                datasets: [
+                                                    {
+                                                        label: 'Terkumpul',
+                                                        data: charts.goalsProgress.map(
+                                                            (goal) =>
+                                                                goal.percent,
+                                                        ),
+                                                        backgroundColor:
+                                                            charts.goalsProgress.map(
                                                                 (goal) =>
-                                                                    goal.percent,
+                                                                    goal.percent >=
+                                                                    100
+                                                                        ? 'hsl(var(--chart-2))'
+                                                                        : 'hsl(var(--primary))',
                                                             ),
-                                                            backgroundColor:
-                                                                charts.goalsProgress.map(
-                                                                    (goal) =>
-                                                                        goal.percent >=
-                                                                        100
-                                                                            ? 'hsl(var(--chart-2))'
-                                                                            : 'hsl(var(--primary))',
-                                                                ),
-                                                            borderRadius: 6,
-                                                            maxBarThickness: 22,
-                                                        },
-                                                    ],
-                                                }}
-                                                options={{
-                                                    indexAxis: 'y',
-                                                    responsive: true,
-                                                    maintainAspectRatio: false,
-                                                    plugins: {
-                                                        legend: {
-                                                            display: false,
-                                                        },
-                                                        tooltip: {
-                                                            callbacks: {
-                                                                label: (
-                                                                    context,
-                                                                ) =>
-                                                                    `${context.parsed.x}% terkumpul`,
-                                                            },
+                                                        borderRadius: 6,
+                                                        maxBarThickness: 22,
+                                                    },
+                                                ],
+                                            }}
+                                            options={{
+                                                indexAxis: 'y',
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: {
+                                                    legend: {
+                                                        display: false,
+                                                    },
+                                                    tooltip: {
+                                                        callbacks: {
+                                                            label: (context) =>
+                                                                `${context.parsed.x}% terkumpul`,
                                                         },
                                                     },
-                                                    scales: {
-                                                        x: {
-                                                            max: 100,
-                                                            ticks: {
-                                                                callback: (
-                                                                    value,
-                                                                ) =>
-                                                                    `${value}%`,
-                                                            },
+                                                },
+                                                scales: {
+                                                    x: {
+                                                        max: 100,
+                                                        ticks: {
+                                                            callback: (value) =>
+                                                                `${value}%`,
                                                         },
                                                     },
-                                                }}
-                                            />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                            {hasSavings && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-base">
-                                            Tabungan 6 Bulan
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="h-64">
-                                            <Line
-                                                data={{
-                                                    labels: charts.monthlySavings.map(
-                                                        (entry) =>
-                                                            formatMonthLabel(
-                                                                entry.month,
-                                                            ),
-                                                    ),
-                                                    datasets: [
-                                                        {
-                                                            label: 'Total disimpan',
-                                                            data: charts.monthlySavings.map(
-                                                                (entry) =>
-                                                                    entry.amount,
-                                                            ),
-                                                            borderColor:
-                                                                'hsl(var(--primary))',
-                                                            backgroundColor:
-                                                                'hsla(var(--primary) / 0.15)',
-                                                            fill: true,
-                                                            tension: 0.3,
-                                                        },
-                                                    ],
-                                                }}
-                                                options={{
-                                                    responsive: true,
-                                                    maintainAspectRatio: false,
-                                                    plugins: {
-                                                        legend: {
-                                                            display: false,
-                                                        },
+                        {hasSavings && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base">
+                                        Tabungan 6 Bulan
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="h-64">
+                                        <Line
+                                            data={{
+                                                labels: charts.monthlySavings.map(
+                                                    (entry) =>
+                                                        formatMonthLabel(
+                                                            entry.month,
+                                                        ),
+                                                ),
+                                                datasets: [
+                                                    {
+                                                        label: 'Total disimpan',
+                                                        data: charts.monthlySavings.map(
+                                                            (entry) =>
+                                                                entry.amount,
+                                                        ),
+                                                        borderColor:
+                                                            'hsl(var(--primary))',
+                                                        backgroundColor:
+                                                            'hsla(var(--primary) / 0.15)',
+                                                        fill: true,
+                                                        tension: 0.3,
                                                     },
-                                                    scales: {
-                                                        y: {
-                                                            ticks: {
-                                                                callback: (
-                                                                    value,
-                                                                ) =>
-                                                                    compactNumber(
-                                                                        Number(
-                                                                            value,
-                                                                        ),
+                                                ],
+                                            }}
+                                            options={{
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: {
+                                                    legend: {
+                                                        display: false,
+                                                    },
+                                                },
+                                                scales: {
+                                                    y: {
+                                                        ticks: {
+                                                            callback: (value) =>
+                                                                compactNumber(
+                                                                    Number(
+                                                                        value,
                                                                     ),
-                                                            },
+                                                                ),
                                                         },
                                                     },
-                                                }}
-                                            />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                            {hasCompleted && (
-                                <Card>
-                                    <CardHeader>
-                                        <CardTitle className="text-base">
-                                            Ingetin Selesai
-                                        </CardTitle>
-                                    </CardHeader>
-                                    <CardContent>
-                                        <div className="h-64">
-                                            <Bar
-                                                data={{
-                                                    labels: charts.remindersCompleted.map(
-                                                        (entry) =>
-                                                            formatWeekLabel(
-                                                                entry.week,
-                                                            ),
-                                                    ),
-                                                    datasets: [
-                                                        {
-                                                            label: 'Selesai',
-                                                            data: charts.remindersCompleted.map(
-                                                                (entry) =>
-                                                                    entry.count,
-                                                            ),
-                                                            backgroundColor:
-                                                                'hsl(var(--chart-2))',
-                                                            borderRadius: 6,
-                                                            maxBarThickness: 28,
-                                                        },
-                                                    ],
-                                                }}
-                                                options={{
-                                                    responsive: true,
-                                                    maintainAspectRatio: false,
-                                                    plugins: {
-                                                        legend: {
-                                                            display: false,
+                        {hasCompleted && (
+                            <Card>
+                                <CardHeader>
+                                    <CardTitle className="text-base">
+                                        Ingetin Selesai
+                                    </CardTitle>
+                                </CardHeader>
+                                <CardContent>
+                                    <div className="h-64">
+                                        <Bar
+                                            data={{
+                                                labels: charts.remindersCompleted.map(
+                                                    (entry) =>
+                                                        formatWeekLabel(
+                                                            entry.week,
+                                                        ),
+                                                ),
+                                                datasets: [
+                                                    {
+                                                        label: 'Selesai',
+                                                        data: charts.remindersCompleted.map(
+                                                            (entry) =>
+                                                                entry.count,
+                                                        ),
+                                                        backgroundColor:
+                                                            'hsl(var(--chart-2))',
+                                                        borderRadius: 6,
+                                                        maxBarThickness: 28,
+                                                    },
+                                                ],
+                                            }}
+                                            options={{
+                                                responsive: true,
+                                                maintainAspectRatio: false,
+                                                plugins: {
+                                                    legend: {
+                                                        display: false,
+                                                    },
+                                                },
+                                                scales: {
+                                                    y: {
+                                                        ticks: {
+                                                            stepSize: 1,
                                                         },
                                                     },
-                                                    scales: {
-                                                        y: {
-                                                            ticks: {
-                                                                stepSize: 1,
-                                                            },
-                                                        },
-                                                    },
-                                                }}
-                                            />
-                                        </div>
-                                    </CardContent>
-                                </Card>
-                            )}
-                        </div>
-                    )
+                                                },
+                                            }}
+                                        />
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        )}
+                    </div>
                 )}
             </div>
         </>
@@ -491,41 +471,6 @@ function compactNumber(value: number): string {
     return new Intl.NumberFormat('id-ID', {
         notation: 'compact',
     }).format(value);
-}
-
-function StatSkeletonGrid() {
-    return (
-        <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
-            {Array.from({ length: 4 }, (_, index) => (
-                <Card key={index} className="h-full border-border/60">
-                    <CardHeader className="pb-2">
-                        <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-muted">
-                            <Skeleton className="size-4" />
-                        </div>
-                        <Skeleton className="h-3 w-24" />
-                        <Skeleton className="mt-1 h-8 w-16" />
-                    </CardHeader>
-                </Card>
-            ))}
-        </div>
-    );
-}
-
-function ChartSkeletonGrid() {
-    return (
-        <div className="grid gap-3 lg:grid-cols-2">
-            {Array.from({ length: 2 }, (_, index) => (
-                <Card key={index} className="border-border/60">
-                    <CardHeader>
-                        <Skeleton className="h-4 w-32" />
-                    </CardHeader>
-                    <CardContent>
-                        <Skeleton className="h-64" />
-                    </CardContent>
-                </Card>
-            ))}
-        </div>
-    );
 }
 
 function FeatureCard({

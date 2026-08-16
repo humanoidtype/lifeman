@@ -12,7 +12,6 @@ import {
 import { CalendarClock, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Line } from 'react-chartjs-2';
-import { ShowPageSkeleton } from '@/components/page-skeletons';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -30,7 +29,6 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useNavigating } from '@/hooks/use-navigating';
 import { formatDate, formatMoney, formatPercent } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
 import { index } from '@/routes/savings-goals';
@@ -88,12 +86,6 @@ export default function SavingsShow({ goal, payments }: Props) {
             paid_at: new Date().toISOString().slice(0, 10),
             note: '',
         });
-
-    const navigating = useNavigating();
-
-    if (navigating) {
-        return <ShowPageSkeleton />;
-    }
 
     function addPayment(): void {
         post(toUrl(storePayment({ savings_goal: goal.id })), {

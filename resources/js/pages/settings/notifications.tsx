@@ -2,10 +2,8 @@ import { Head, router, usePage } from '@inertiajs/react';
 import { Bell, Check, Volume2 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import Heading from '@/components/heading';
-import { SettingsPageSkeleton } from '@/components/page-skeletons';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { useNavigating } from '@/hooks/use-navigating';
 import {
     SOUNDS,
     isNativePlatform,
@@ -34,12 +32,6 @@ export default function Notifications() {
         },
         [],
     );
-
-    const navigating = useNavigating();
-
-    if (navigating) {
-        return <SettingsPageSkeleton />;
-    }
 
     function preview(soundId: string): void {
         if (soundId === 'default') {

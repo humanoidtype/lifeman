@@ -5,7 +5,6 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { useBackHandler } from '@/hooks/use-back-handler';
-import { NavigatingProvider } from '@/hooks/use-navigating';
 import { RefreshingProvider } from '@/hooks/use-refreshing';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
@@ -50,30 +49,32 @@ createInertiaApp({
 
         return (
             <RefreshingProvider>
-                <NavigatingProvider>
-                    <TooltipProvider delayDuration={0}>
-                        {DIAGNOSE_ENABLED ? (
-                            <AppErrorBoundary label="APP">
-                                <AppErrorBoundary label="HALAMAN">
-                                    {app}
-                                </AppErrorBoundary>
-                                <Toaster />
-                                <BackButtonHandler />
-                            </AppErrorBoundary>
-                        ) : (
-                            <>
+                <TooltipProvider delayDuration={0}>
+                    {DIAGNOSE_ENABLED ? (
+                        <AppErrorBoundary label="APP">
+                            <AppErrorBoundary label="HALAMAN">
                                 {app}
-                                <Toaster />
-                                <BackButtonHandler />
-                            </>
-                        )}
-                        <AppSplash appVersion={appVersion} />
-                    </TooltipProvider>
-                </NavigatingProvider>
+                            </AppErrorBoundary>
+                            <Toaster />
+                            <BackButtonHandler />
+                        </AppErrorBoundary>
+                    ) : (
+                        <>
+                            {app}
+                            <Toaster />
+                            <BackButtonHandler />
+                        </>
+                    )}
+                    <AppSplash appVersion={appVersion} />
+                </TooltipProvider>
             </RefreshingProvider>
         );
     },
-    progress: false,
+    progress: {
+        delay: 250,
+        color: '#E17100',
+        includeCSS: true,
+    },
 });
 
 // This will set light / dark mode on load...
