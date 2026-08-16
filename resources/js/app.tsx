@@ -5,10 +5,10 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { useBackHandler } from '@/hooks/use-back-handler';
-import { useFreshData } from '@/hooks/use-fresh-data';
 import { RefreshingProvider } from '@/hooks/use-refreshing';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
+import GlobalChromeLayout from '@/layouts/global-chrome-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { initBootDiag } from '@/lib/diagnose';
 
@@ -22,12 +22,6 @@ function BackButtonHandler() {
     return null;
 }
 
-function FreshDataHandler() {
-    useFreshData();
-
-    return null;
-}
-
 createInertiaApp({
     title: (title) => (title ? `${title} - ${appName}` : appName),
     layout: (name) => {
@@ -35,11 +29,11 @@ createInertiaApp({
             case name === 'welcome':
                 return null;
             case name.startsWith('auth/'):
-                return AuthLayout;
+                return [AuthLayout, GlobalChromeLayout];
             case name.startsWith('settings/'):
-                return [AppLayout, SettingsLayout];
+                return [AppLayout, SettingsLayout, GlobalChromeLayout];
             default:
-                return AppLayout;
+                return [AppLayout, GlobalChromeLayout];
         }
     },
     strictMode: true,
@@ -54,7 +48,6 @@ createInertiaApp({
                         <Toaster />
                         <LoadingOverlay />
                         <BackButtonHandler />
-                        <FreshDataHandler />
                     </AppErrorBoundary>
                 </TooltipProvider>
             </RefreshingProvider>
