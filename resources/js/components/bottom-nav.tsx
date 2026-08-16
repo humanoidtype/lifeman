@@ -63,7 +63,7 @@ export function BottomNav() {
                         className={cn(
                             'flex flex-col items-center gap-0.5 rounded-full px-3.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground sm:px-5',
                             isActive(toUrl(item.href)) &&
-                                'bg-primary text-primary-foreground hover:text-primary-foreground',
+                                'font-semibold text-amber-600 hover:text-amber-600 dark:text-amber-400 dark:hover:text-amber-400',
                         )}
                     >
                         <item.icon className="size-5" />

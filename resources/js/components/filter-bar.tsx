@@ -10,6 +10,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import { cn } from '@/lib/utils';
 
 export type FilterOption = {
     value: string;
@@ -77,8 +78,12 @@ export function FilterBar({
         return () => clearTimeout(timer);
     }, [search, status, sort, url]);
 
+    const hasStatus = statusOptions.length > 0;
+    const hasSort = sortOptions.length > 0;
+    const controlsCols = hasStatus && hasSort ? 'grid-cols-2' : 'grid-cols-1';
+
     return (
-        <div className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
+        <div className="grid gap-2">
             <div className="relative">
                 <Search className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
@@ -89,53 +94,55 @@ export function FilterBar({
                 />
             </div>
 
-            {statusOptions.length > 0 && (
-                <div className="grid gap-1.5">
-                    <Label className="sr-only">Status</Label>
-                    <Select value={status} onValueChange={setStatus}>
-                        <SelectTrigger className="w-full sm:w-40">
-                            <SelectValue placeholder={statusPlaceholder} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">
-                                {statusPlaceholder}
-                            </SelectItem>
-                            {statusOptions.map((option) => (
-                                <SelectItem
-                                    key={option.value}
-                                    value={option.value}
-                                >
-                                    {option.label}
+            <div className={cn('grid gap-2', controlsCols)}>
+                {hasStatus && (
+                    <div className="grid gap-1.5">
+                        <Label className="sr-only">Status</Label>
+                        <Select value={status} onValueChange={setStatus}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder={statusPlaceholder} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="all">
+                                    {statusPlaceholder}
                                 </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            )}
+                                {statusOptions.map((option) => (
+                                    <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
 
-            {sortOptions.length > 0 && (
-                <div className="grid gap-1.5">
-                    <Label className="sr-only">Urutan</Label>
-                    <Select value={sort} onValueChange={setSort}>
-                        <SelectTrigger className="w-full sm:w-40">
-                            <SelectValue placeholder={sortPlaceholder} />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="default">
-                                {sortPlaceholder}
-                            </SelectItem>
-                            {sortOptions.map((option) => (
-                                <SelectItem
-                                    key={option.value}
-                                    value={option.value}
-                                >
-                                    {option.label}
+                {hasSort && (
+                    <div className="grid gap-1.5">
+                        <Label className="sr-only">Urutan</Label>
+                        <Select value={sort} onValueChange={setSort}>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder={sortPlaceholder} />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="default">
+                                    {sortPlaceholder}
                                 </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-            )}
+                                {sortOptions.map((option) => (
+                                    <SelectItem
+                                        key={option.value}
+                                        value={option.value}
+                                    >
+                                        {option.label}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

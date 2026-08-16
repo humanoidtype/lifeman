@@ -1,29 +1,10 @@
 import { Head, Link } from '@inertiajs/react';
-import {
-    Chart as ChartJS,
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
-    Tooltip,
-    Legend,
-    Filler,
-} from 'chart.js';
-import {
-    AlarmClock,
-    ArrowRight,
-    PiggyBank,
-    Target,
-    Wallet,
-} from 'lucide-react';
-import { Bar, Line } from 'react-chartjs-2';
+import { AlarmClock, PiggyBank, Target, Wallet } from 'lucide-react';
 import { NettoBadge } from '@/components/netto-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
     Card,
-    CardContent,
     CardDescription,
     CardHeader,
     CardTitle,
@@ -31,21 +12,9 @@ import {
 import { formatMoney } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
-import { index as cashflowsIndex } from '@/routes/cashflows';
 import { index as remindersIndex } from '@/routes/reminders';
 import { index as savingsIndex } from '@/routes/savings-goals';
 import type { Auth } from '@/types';
-
-ChartJS.register(
-    CategoryScale,
-    LinearScale,
-    BarElement,
-    PointElement,
-    LineElement,
-    Tooltip,
-    Legend,
-    Filler,
-);
 
 type Props = {
     auth: Auth;
@@ -60,20 +29,9 @@ type Props = {
             expenseTotal: number;
         } | null;
     };
-    charts: {
-        goalsProgress: {
-            id: number;
-            title: string;
-            paid: number;
-            target: number;
-            percent: number;
-        }[];
-        monthlySavings: { month: string; amount: number }[];
-        remindersCompleted: { week: string; count: number }[];
-    };
 };
 
-export default function Dashboard({ auth, stats, charts }: Props) {
+export default function Dashboard({ auth, stats }: Props) {
     const firstName = auth.user.name.split(' ')[0];
     const today = new Date().toLocaleDateString('id-ID', {
         weekday: 'long',
@@ -84,10 +42,6 @@ export default function Dashboard({ auth, stats, charts }: Props) {
     const cashflowNetto = stats.latestCashflow
         ? stats.latestCashflow.incomeTotal - stats.latestCashflow.expenseTotal
         : 0;
-    const hasSavings = charts.monthlySavings.some((entry) => entry.amount > 0);
-    const hasCompleted = charts.remindersCompleted.some(
-        (entry) => entry.count > 0,
-    );
 
     return (
         <>
@@ -225,288 +179,8 @@ export default function Dashboard({ auth, stats, charts }: Props) {
                         </CardHeader>
                     </Card>
                 </div>
-
-                <div className="grid gap-3 sm:grid-cols-2">
-                    <FeatureCard
-                        icon={AlarmClock}
-                        title="Ingetin"
-                        description={
-                            stats.pendingReminders > 0
-                                ? `${stats.pendingReminders} ingatan aktif${
-                                      stats.overdueReminders > 0
-                                          ? `, ${stats.overdueReminders} terlewat`
-                                          : ''
-                                  }`
-                                : 'Buat pengingat pertama mu'
-                        }
-                        href={toUrl(remindersIndex())}
-                    />
-                    <FeatureCard
-                        icon={PiggyBank}
-                        title="Nabung"
-                        description={
-                            stats.activeGoals > 0
-                                ? `${formatMoney(stats.savedAmount)} terkumpul dari ${stats.activeGoals} target`
-                                : 'Mulai target tabungan pertama mu'
-                        }
-                        href={toUrl(savingsIndex())}
-                    />
-                    <FeatureCard
-                        icon={Wallet}
-                        title="Kas"
-                        description={
-                            stats.latestCashflow
-                                ? `${formatMoney(
-                                      stats.latestCashflow.incomeTotal -
-                                          stats.latestCashflow.expenseTotal,
-                                  )} netto dari ${stats.latestCashflow.title}`
-                                : 'Catat pemasukan & pengeluaranmu'
-                        }
-                        href={toUrl(cashflowsIndex())}
-                    />
-                </div>
-
-                {(charts.goalsProgress.length > 0 ||
-                    hasSavings ||
-                    hasCompleted) && (
-                    <div className="grid gap-3 lg:grid-cols-2">
-                        {charts.goalsProgress.length > 0 && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-base">
-                                        Progress Nabung
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="h-64">
-                                        <Bar
-                                            data={{
-                                                labels: charts.goalsProgress.map(
-                                                    (goal) => goal.title,
-                                                ),
-                                                datasets: [
-                                                    {
-                                                        label: 'Terkumpul',
-                                                        data: charts.goalsProgress.map(
-                                                            (goal) =>
-                                                                goal.percent,
-                                                        ),
-                                                        backgroundColor:
-                                                            charts.goalsProgress.map(
-                                                                (goal) =>
-                                                                    goal.percent >=
-                                                                    100
-                                                                        ? 'hsl(var(--chart-2))'
-                                                                        : 'hsl(var(--primary))',
-                                                            ),
-                                                        borderRadius: 6,
-                                                        maxBarThickness: 22,
-                                                    },
-                                                ],
-                                            }}
-                                            options={{
-                                                indexAxis: 'y',
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                plugins: {
-                                                    legend: {
-                                                        display: false,
-                                                    },
-                                                    tooltip: {
-                                                        callbacks: {
-                                                            label: (context) =>
-                                                                `${context.parsed.x}% terkumpul`,
-                                                        },
-                                                    },
-                                                },
-                                                scales: {
-                                                    x: {
-                                                        max: 100,
-                                                        ticks: {
-                                                            callback: (value) =>
-                                                                `${value}%`,
-                                                        },
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-
-                        {hasSavings && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-base">
-                                        Tabungan 6 Bulan
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="h-64">
-                                        <Line
-                                            data={{
-                                                labels: charts.monthlySavings.map(
-                                                    (entry) =>
-                                                        formatMonthLabel(
-                                                            entry.month,
-                                                        ),
-                                                ),
-                                                datasets: [
-                                                    {
-                                                        label: 'Total disimpan',
-                                                        data: charts.monthlySavings.map(
-                                                            (entry) =>
-                                                                entry.amount,
-                                                        ),
-                                                        borderColor:
-                                                            'hsl(var(--primary))',
-                                                        backgroundColor:
-                                                            'hsla(var(--primary) / 0.15)',
-                                                        fill: true,
-                                                        tension: 0.3,
-                                                    },
-                                                ],
-                                            }}
-                                            options={{
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                plugins: {
-                                                    legend: {
-                                                        display: false,
-                                                    },
-                                                },
-                                                scales: {
-                                                    y: {
-                                                        ticks: {
-                                                            callback: (value) =>
-                                                                compactNumber(
-                                                                    Number(
-                                                                        value,
-                                                                    ),
-                                                                ),
-                                                        },
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-
-                        {hasCompleted && (
-                            <Card>
-                                <CardHeader>
-                                    <CardTitle className="text-base">
-                                        Ingetin Selesai
-                                    </CardTitle>
-                                </CardHeader>
-                                <CardContent>
-                                    <div className="h-64">
-                                        <Bar
-                                            data={{
-                                                labels: charts.remindersCompleted.map(
-                                                    (entry) =>
-                                                        formatWeekLabel(
-                                                            entry.week,
-                                                        ),
-                                                ),
-                                                datasets: [
-                                                    {
-                                                        label: 'Selesai',
-                                                        data: charts.remindersCompleted.map(
-                                                            (entry) =>
-                                                                entry.count,
-                                                        ),
-                                                        backgroundColor:
-                                                            'hsl(var(--chart-2))',
-                                                        borderRadius: 6,
-                                                        maxBarThickness: 28,
-                                                    },
-                                                ],
-                                            }}
-                                            options={{
-                                                responsive: true,
-                                                maintainAspectRatio: false,
-                                                plugins: {
-                                                    legend: {
-                                                        display: false,
-                                                    },
-                                                },
-                                                scales: {
-                                                    y: {
-                                                        ticks: {
-                                                            stepSize: 1,
-                                                        },
-                                                    },
-                                                },
-                                            }}
-                                        />
-                                    </div>
-                                </CardContent>
-                            </Card>
-                        )}
-                    </div>
-                )}
             </div>
         </>
-    );
-}
-
-function formatMonthLabel(month: string): string {
-    return new Date(`${month}-01T00:00:00`).toLocaleDateString('id-ID', {
-        month: 'short',
-        year: '2-digit',
-    });
-}
-
-function formatWeekLabel(date: string): string {
-    return new Date(`${date}T00:00:00`).toLocaleDateString('id-ID', {
-        day: '2-digit',
-        month: 'short',
-    });
-}
-
-function compactNumber(value: number): string {
-    return new Intl.NumberFormat('id-ID', {
-        notation: 'compact',
-    }).format(value);
-}
-
-function FeatureCard({
-    icon: Icon,
-    title,
-    description,
-    href,
-}: {
-    icon: typeof AlarmClock;
-    title: string;
-    description: string;
-    href: string;
-}) {
-    return (
-        <Link
-            href={href}
-            prefetch="mount"
-            cacheFor="60s"
-            className="group block h-full"
-        >
-            <Card className="h-full transition-all duration-200 group-hover:-translate-y-1 group-hover:border-primary/50 group-hover:shadow-lg">
-                <CardHeader className="pb-2">
-                    <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-muted text-foreground transition-transform duration-200 group-hover:scale-110">
-                        <Icon className="size-5" />
-                    </div>
-                    <CardTitle className="flex items-center gap-2 text-base">
-                        {title}
-                        <ArrowRight className="size-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
-                    </CardTitle>
-                </CardHeader>
-                <CardContent className="text-sm text-muted-foreground">
-                    {description}
-                </CardContent>
-            </Card>
-        </Link>
     );
 }
 

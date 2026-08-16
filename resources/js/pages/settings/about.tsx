@@ -102,7 +102,7 @@ export default function About() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-4">
+                    <CardContent className="px-4 py-3">
                         <div className="flex items-center gap-3">
                             <AppLogoIcon className="size-14 rounded-2xl" />
                             <div className="min-w-0">
@@ -131,7 +131,7 @@ export default function About() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="space-y-3 p-4">
+                    <CardContent className="space-y-3 px-4 py-3">
                         {checking ? (
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <LoaderCircle className="size-4 animate-spin" />
@@ -225,7 +225,7 @@ export default function About() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-4">
+                    <CardContent className="px-4 py-3">
                         {update?.changelog ? (
                             <div className="space-y-3">
                                 <p className="text-sm font-medium text-muted-foreground">
@@ -266,7 +266,7 @@ export default function About() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="space-y-3 p-4">
+                    <CardContent className="space-y-3 px-4 py-3">
                         <p className="text-sm text-muted-foreground">
                             Suka menggunakan {APP_NAME}? Dukung pengembangan{' '}
                             {APP_NAME} melalui Saweria.

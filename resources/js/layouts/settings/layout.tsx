@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Bell, Info, Lock, Palette, User } from 'lucide-react';
+import { Info, Palette, User } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
@@ -9,9 +9,7 @@ import type { UpdateInfo } from '@/lib/update-check';
 import { cn, toUrl } from '@/lib/utils';
 import { edit as editAbout } from '@/routes/about';
 import { edit as editAppearance } from '@/routes/appearance';
-import { edit as editNotifications } from '@/routes/notifications';
 import { edit } from '@/routes/profile';
-import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
@@ -21,19 +19,9 @@ const sidebarNavItems: NavItem[] = [
         icon: User,
     },
     {
-        title: 'Kata Sandi',
-        href: editSecurity(),
-        icon: Lock,
-    },
-    {
-        title: 'Tampilan',
+        title: 'Tampilan & Suara',
         href: editAppearance(),
         icon: Palette,
-    },
-    {
-        title: 'Notifikasi',
-        href: editNotifications(),
-        icon: Bell,
     },
     {
         title: 'Tentang App',

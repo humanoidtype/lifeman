@@ -1,9 +1,19 @@
 import { Form, Head, Link, usePage } from '@inertiajs/react';
-import { LogOut, Mail, ShieldCheck, ShieldAlert, User } from 'lucide-react';
+import {
+    KeyRound,
+    LogOut,
+    Mail,
+    ShieldCheck,
+    ShieldAlert,
+    User,
+} from 'lucide-react';
+import { useRef } from 'react';
 import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -33,6 +43,8 @@ export default function Profile({
 }) {
     const { auth } = usePage<PageProps>().props;
     const verified = auth.user.email_verified_at !== null;
+    const passwordInput = useRef<HTMLInputElement>(null);
+    const currentPasswordInput = useRef<HTMLInputElement>(null);
 
     return (
         <>
@@ -48,7 +60,7 @@ export default function Profile({
                 />
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-3">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <User className="size-4" />
                         </span>
@@ -59,7 +71,7 @@ export default function Profile({
                             </CardDescription>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-4">
+                    <CardContent className="px-4 py-3">
                         <Form
                             {...ProfileController.update.form()}
                             options={{
@@ -100,7 +112,7 @@ export default function Profile({
                 </Card>
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-3">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Mail className="size-4" />
                         </span>
@@ -112,24 +124,30 @@ export default function Profile({
                                 Email tidak dapat diubah setelah terdaftar
                             </CardDescription>
                         </div>
-                        <span
-                            className={cn(
-                                'ml-auto inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
-                                verified
-                                    ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
-                                    : 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
-                            )}
-                        >
-                            {verified ? (
-                                <ShieldCheck className="size-3.5" />
-                            ) : (
-                                <ShieldAlert className="size-3.5" />
-                            )}
-                            {verified ? 'Terverifikasi' : 'Belum terverifikasi'}
-                        </span>
                     </CardHeader>
-                    <CardContent className="space-y-3 p-4">
-                        <p className="text-sm font-medium">{auth.user.email}</p>
+                    <CardContent className="space-y-3 px-4 py-3">
+                        <div className="flex flex-wrap items-center gap-2">
+                            <p className="text-sm font-medium">
+                                {auth.user.email}
+                            </p>
+                            <span
+                                className={cn(
+                                    'inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium',
+                                    verified
+                                        ? 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400'
+                                        : 'bg-amber-500/10 text-amber-600 dark:text-amber-400',
+                                )}
+                            >
+                                {verified ? (
+                                    <ShieldCheck className="size-3.5" />
+                                ) : (
+                                    <ShieldAlert className="size-3.5" />
+                                )}
+                                {verified
+                                    ? 'Terverifikasi'
+                                    : 'Belum terverifikasi'}
+                            </span>
+                        </div>
 
                         {mustVerifyEmail && !verified && (
                             <div className="rounded-xl border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
@@ -164,7 +182,115 @@ export default function Profile({
                 </Card>
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-3">
+                        <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                            <KeyRound className="size-4" />
+                        </span>
+                        <div>
+                            <CardTitle className="text-base">
+                                Ubah password
+                            </CardTitle>
+                            <CardDescription>
+                                Gunakan password yang panjang dan unik
+                            </CardDescription>
+                        </div>
+                    </CardHeader>
+                    <CardContent className="px-4 py-3">
+                        <Form
+                            {...SecurityController.update.form()}
+                            options={{
+                                preserveScroll: true,
+                            }}
+                            resetOnError={[
+                                'password',
+                                'password_confirmation',
+                                'current_password',
+                            ]}
+                            resetOnSuccess
+                            onError={(errors) => {
+                                if (errors.password) {
+                                    passwordInput.current?.focus();
+                                }
+
+                                if (errors.current_password) {
+                                    currentPasswordInput.current?.focus();
+                                }
+                            }}
+                            className="space-y-3"
+                        >
+                            {({ errors, processing }) => (
+                                <>
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="current_password">
+                                            Password saat ini
+                                        </Label>
+
+                                        <PasswordInput
+                                            id="current_password"
+                                            ref={currentPasswordInput}
+                                            name="current_password"
+                                            className="mt-1 block w-full rounded-xl"
+                                            autoComplete="current-password"
+                                            placeholder="Password saat ini"
+                                        />
+
+                                        <InputError
+                                            message={errors.current_password}
+                                        />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="password">
+                                            Password baru
+                                        </Label>
+
+                                        <PasswordInput
+                                            id="password"
+                                            ref={passwordInput}
+                                            name="password"
+                                            className="mt-1 block w-full rounded-xl"
+                                            autoComplete="new-password"
+                                            placeholder="Password baru"
+                                        />
+
+                                        <InputError message={errors.password} />
+                                    </div>
+
+                                    <div className="grid gap-2">
+                                        <Label htmlFor="password_confirmation">
+                                            Konfirmasi password
+                                        </Label>
+
+                                        <PasswordInput
+                                            id="password_confirmation"
+                                            name="password_confirmation"
+                                            className="mt-1 block w-full rounded-xl"
+                                            autoComplete="new-password"
+                                            placeholder="Ulangi password baru"
+                                        />
+
+                                        <InputError
+                                            message={
+                                                errors.password_confirmation
+                                            }
+                                        />
+                                    </div>
+
+                                    <Button
+                                        disabled={processing}
+                                        className="rounded-xl bg-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5"
+                                        data-test="update-password-button"
+                                    >
+                                        Simpan password
+                                    </Button>
+                                </>
+                            )}
+                        </Form>
+                    </CardContent>
+                </Card>
+
+                <Card className="overflow-hidden rounded-2xl">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-3">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                             <LogOut className="size-4" />
                         </span>
@@ -175,7 +301,7 @@ export default function Profile({
                             </CardDescription>
                         </div>
                     </CardHeader>
-                    <CardContent className="grid gap-3 p-4 sm:grid-cols-2">
+                    <CardContent className="grid gap-3 px-4 py-3 sm:grid-cols-2">
                         <Button
                             asChild
                             variant="secondary"

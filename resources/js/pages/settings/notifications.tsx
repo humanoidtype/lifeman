@@ -99,7 +99,7 @@ export default function Notifications() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="grid gap-3 p-4">
+                    <CardContent className="grid gap-3 px-4 py-3">
                         {SOUNDS.map((sound) => {
                             const isSelected = selected === sound.id;
                             const isDefault = sound.id === 'default';
