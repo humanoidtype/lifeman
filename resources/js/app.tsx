@@ -1,4 +1,5 @@
 import { createInertiaApp } from '@inertiajs/react';
+import { AppErrorBoundary } from '@/components/app-error-boundary';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -9,6 +10,9 @@ import { RefreshingProvider } from '@/hooks/use-refreshing';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
+import { initBootDiag } from '@/lib/diagnose';
+
+initBootDiag();
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -43,11 +47,15 @@ createInertiaApp({
         return (
             <RefreshingProvider>
                 <TooltipProvider delayDuration={0}>
-                    {app}
-                    <Toaster />
-                    <LoadingOverlay />
-                    <BackButtonHandler />
-                    <FreshDataHandler />
+                    <AppErrorBoundary label="APP">
+                        <AppErrorBoundary label="HALAMAN">
+                            {app}
+                        </AppErrorBoundary>
+                        <Toaster />
+                        <LoadingOverlay />
+                        <BackButtonHandler />
+                        <FreshDataHandler />
+                    </AppErrorBoundary>
                 </TooltipProvider>
             </RefreshingProvider>
         );

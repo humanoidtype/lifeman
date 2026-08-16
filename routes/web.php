@@ -16,6 +16,32 @@ Route::get('/', function () {
     return auth()->check() ? redirect()->route('dashboard') : Inertia::render('welcome');
 })->name('home');
 
+Route::get('/diagnose-assets', function () {
+    $manifestPath = public_path('build/manifest.json');
+
+    if (! is_file($manifestPath)) {
+        return response()->json(['entry' => null, 'total' => 0, 'missing' => [], 'ok' => false]);
+    }
+
+    $manifest = json_decode((string) file_get_contents($manifestPath), true) ?: [];
+    $missing = [];
+
+    foreach ($manifest as $chunk) {
+        $file = $chunk['file'] ?? null;
+
+        if ($file !== null && ! is_file(public_path('build/'.$file))) {
+            $missing[] = $file;
+        }
+    }
+
+    return response()->json([
+        'entry' => $manifest['resources/js/app.tsx']['file'] ?? null,
+        'total' => count($manifest),
+        'missing' => $missing,
+        'ok' => $missing === [],
+    ]);
+})->name('diagnose-assets');
+
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
         $user = auth()->user();
