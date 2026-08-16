@@ -54,6 +54,21 @@ test('cashflow item validation requires type, name, and amount', function () {
         ->assertSessionHasErrors(['type', 'name', 'amount']);
 });
 
+test('cashflow item store rejects missing type', function () {
+    $user = User::factory()->create();
+    $cashflow = Cashflow::factory()->for($user)->create();
+
+    $this->actingAs($user)
+        ->post(route('cashflow-items.store', $cashflow), [
+            'name' => 'Bensin',
+            'amount' => 50_000,
+            'quantity' => 1,
+        ])
+        ->assertSessionHasErrors('type');
+
+    expect(CashflowItem::query()->where('cashflow_id', $cashflow->id)->count())->toBe(0);
+});
+
 test('users cannot add items to cashflows of other users', function () {
     $user = User::factory()->create();
     $other = User::factory()->create();

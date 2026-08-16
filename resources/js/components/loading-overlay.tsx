@@ -2,31 +2,43 @@ import { router } from '@inertiajs/react';
 import { useEffect, useState } from 'react';
 
 const SHOW_DELAY_MS = 400;
+const SAFETY_TIMEOUT_MS = 15_000;
 
 export function LoadingOverlay() {
     const [visible, setVisible] = useState(false);
 
     useEffect(() => {
         let timer: number | undefined;
-
-        const start = (): void => {
-            timer = window.setTimeout(() => setVisible(true), SHOW_DELAY_MS);
-        };
+        let safetyTimer: number | undefined;
 
         const finish = (): void => {
             window.clearTimeout(timer);
+            window.clearTimeout(safetyTimer);
             setVisible(false);
+        };
+
+        const start = (): void => {
+            finish();
+            timer = window.setTimeout(() => setVisible(true), SHOW_DELAY_MS);
+            safetyTimer = window.setTimeout(finish, SAFETY_TIMEOUT_MS);
         };
 
         const offStart = router.on('start', start);
         const offFinish = router.on('finish', finish);
         const offError = router.on('error', finish);
+        const offCancel = router.on('cancel', finish);
+        const offHttpException = router.on('httpException', finish);
+        const offNetworkError = router.on('networkError', finish);
 
         return () => {
             window.clearTimeout(timer);
+            window.clearTimeout(safetyTimer);
             offStart();
             offFinish();
             offError();
+            offCancel();
+            offHttpException();
+            offNetworkError();
         };
     }, []);
 

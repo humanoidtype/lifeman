@@ -35,6 +35,7 @@ type Props = {
 };
 
 type AddForm = {
+    type: 'income' | 'expense';
     name: string;
     amount: string;
     quantity: string;
@@ -135,7 +136,12 @@ function IncomeSection({
     onEdit: (item: CashflowItem) => void;
 }) {
     const { data, setData, errors, processing, post, reset } =
-        useForm<AddForm>({ name: '', amount: '', quantity: '1' });
+        useForm<AddForm>({
+            type: 'income',
+            name: '',
+            amount: '',
+            quantity: '1',
+        });
 
     function addItem(): void {
         post(toUrl(storeItem({ cashflow: cashflowId })), {
@@ -149,6 +155,9 @@ function IncomeSection({
                 <CardTitle className="text-base">Pemasukan</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3">
+                {errors.type && (
+                    <p className="text-sm text-destructive">{errors.type}</p>
+                )}
                 <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto]">
                     <div className="grid gap-2">
                         <Label htmlFor="income-name">Nama</Label>
@@ -216,7 +225,12 @@ function ExpenseSection({
     onEdit: (item: CashflowItem) => void;
 }) {
     const { data, setData, errors, processing, post, reset } =
-        useForm<AddForm>({ name: '', amount: '', quantity: '1' });
+        useForm<AddForm>({
+            type: 'expense',
+            name: '',
+            amount: '',
+            quantity: '1',
+        });
 
     function addItem(): void {
         post(toUrl(storeItem({ cashflow: cashflowId })), {
@@ -236,6 +250,9 @@ function ExpenseSection({
                 <CardTitle className="text-base">Pengeluaran</CardTitle>
             </CardHeader>
             <CardContent className="grid gap-3">
+                {errors.type && (
+                    <p className="text-sm text-destructive">{errors.type}</p>
+                )}
                 <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto_auto]">
                     <div className="grid gap-2">
                         <Label htmlFor="expense-name">Nama</Label>
