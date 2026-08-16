@@ -1,13 +1,11 @@
-type AssetSyncState = {
-    status: 'checking' | 'match' | 'mismatch' | 'unavailable';
-    detail: string;
-};
+import { checkAssets } from '@/lib/asset-check';
+import type { AssetSyncResult } from '@/lib/asset-check';
 
 let initialized = false;
 let panel: HTMLDivElement | null = null;
 let panelText: HTMLDivElement | null = null;
 let reactMounted = false;
-let assetSync: AssetSyncState = { status: 'checking', detail: 'memeriksa...' };
+let assetSync: AssetSyncResult = { status: 'checking', detail: 'memeriksa...' };
 
 function renderPanel(): void {
     if (panelText === null) {
@@ -51,47 +49,6 @@ function showErrorOverlay(
 
     overlay.append(pre, close);
     document.body.appendChild(overlay);
-}
-
-async function checkAssetSync(): Promise<void> {
-    const entry =
-        document
-            .querySelector<HTMLScriptElement>(
-                'script[type="module"][src*="/build/"]',
-            )
-            ?.src.split('/')
-            .pop() ?? '(tidak ditemukan)';
-
-    try {
-        const controller = new AbortController();
-        const timer = window.setTimeout(() => controller.abort(), 8000);
-        const response = await fetch('/diagnose-assets', {
-            headers: { Accept: 'application/json' },
-            signal: controller.signal,
-        });
-        window.clearTimeout(timer);
-
-        if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-        }
-
-        const data: { entry?: string; total?: number; missing?: string[] } =
-            await response.json();
-        const missing = data.missing ?? [];
-        const match = data.entry === entry && missing.length === 0;
-
-        assetSync = {
-            status: match ? 'match' : 'mismatch',
-            detail: `dipakai: ${entry} | manifest: ${data.entry ?? '?'} (${data.total ?? '?'})${missing.length > 0 ? ` | MISSING: ${missing.join(', ')}` : ''}`,
-        };
-    } catch (error) {
-        assetSync = {
-            status: 'unavailable',
-            detail: `/diagnose-assets gagal: ${error instanceof Error ? error.message : String(error)}`,
-        };
-    }
-
-    renderPanel();
 }
 
 export function initBootDiag(): void {
@@ -145,6 +102,7 @@ export function initBootDiag(): void {
 
     window.addEventListener('unhandledrejection', (event) => {
         const reason = event.reason;
+
         showErrorOverlay(
             'UNHANDLED REJECTION',
             reason instanceof Error ? reason.message : String(reason),
@@ -152,7 +110,10 @@ export function initBootDiag(): void {
         );
     });
 
-    void checkAssetSync();
+    void checkAssets().then((result) => {
+        assetSync = result;
+        renderPanel();
+    });
 
     window.setTimeout(() => panel?.remove(), 12000);
 }

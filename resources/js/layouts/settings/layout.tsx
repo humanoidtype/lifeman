@@ -16,7 +16,7 @@ import type { NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Profil',
+        title: 'Pengaturan',
         href: edit(),
         icon: User,
     },

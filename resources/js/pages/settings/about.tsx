@@ -3,6 +3,7 @@ import {
     AlertCircle,
     CheckCircle2,
     Download,
+    ExternalLink,
     Heart,
     Info,
     RefreshCw,
@@ -10,16 +11,19 @@ import {
 import { useEffect, useState } from 'react';
 import AppLogoIcon from '@/components/app-logo-icon';
 import Heading from '@/components/heading';
+import { SettingsPageSkeleton } from '@/components/page-skeletons';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigating } from '@/hooks/use-navigating';
 import { checkForUpdates } from '@/lib/update-check';
 import type { UpdateInfo } from '@/lib/update-check';
 
 const APP_NAME = import.meta.env.VITE_APP_NAME || 'Life Man';
 const DEVELOPER_NAME = 'HumanoidType';
 const SUPPORT_URL = 'https://saweria.co/';
+const MIN_CHECK_MS = 600;
 
 function openExternal(url: string): void {
     window.open(url, '_system');
@@ -33,7 +37,9 @@ export default function About() {
     useEffect(() => {
         let cancelled = false;
 
-        checkForUpdates(appVersion).then((info) => {
+        void checkForUpdates(appVersion).then(async (info) => {
+            await new Promise((resolve) => setTimeout(resolve, MIN_CHECK_MS));
+
             if (!cancelled) {
                 setUpdate(info);
                 setChecking(false);
@@ -45,11 +51,30 @@ export default function About() {
         };
     }, [appVersion]);
 
+    const navigating = useNavigating();
+
+    if (navigating) {
+        return <SettingsPageSkeleton />;
+    }
+
     function recheck(): void {
         setChecking(true);
+        const started = Date.now();
+
         checkForUpdates(appVersion, true).then((info) => {
-            setUpdate(info);
-            setChecking(false);
+            const elapsed = Date.now() - started;
+
+            if (elapsed >= MIN_CHECK_MS) {
+                setUpdate(info);
+                setChecking(false);
+
+                return;
+            }
+
+            window.setTimeout(() => {
+                setUpdate(info);
+                setChecking(false);
+            }, MIN_CHECK_MS - elapsed);
         });
     }
 
@@ -59,6 +84,7 @@ export default function About() {
               minute: '2-digit',
           })
         : null;
+    const releaseUrl = update?.releaseUrl;
 
     return (
         <>
@@ -205,13 +231,23 @@ export default function About() {
                     </CardHeader>
                     <CardContent className="p-5">
                         {update?.changelog ? (
-                            <div className="space-y-2">
+                            <div className="space-y-3">
                                 <p className="text-sm font-medium text-muted-foreground">
                                     Versi {update.latestVersion ?? appVersion}
                                 </p>
-                                <p className="text-sm whitespace-pre-wrap">
+                                <p className="max-h-56 overflow-y-auto text-sm whitespace-pre-wrap">
                                     {update.changelog}
                                 </p>
+                                {releaseUrl && (
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => openExternal(releaseUrl)}
+                                    >
+                                        <ExternalLink className="size-4" />
+                                        Lihat semua rilis
+                                    </Button>
+                                )}
                             </div>
                         ) : (
                             <p className="text-sm text-muted-foreground">

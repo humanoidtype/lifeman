@@ -1,12 +1,20 @@
 // Components
 import { Form, Head } from '@inertiajs/react';
+import { AuthPageSkeleton } from '@/components/page-skeletons';
 import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
+import { useNavigating } from '@/hooks/use-navigating';
 import { logout } from '@/routes';
 import { send } from '@/routes/verification';
 
 export default function VerifyEmail({ status }: { status?: string }) {
+    const navigating = useNavigating();
+
+    if (navigating) {
+        return <AuthPageSkeleton />;
+    }
+
     return (
         <>
             <Head title="Email verification" />

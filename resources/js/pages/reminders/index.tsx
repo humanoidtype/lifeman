@@ -24,6 +24,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigating } from '@/hooks/use-navigating';
 import { useRefreshing } from '@/hooks/use-refreshing';
 import { formatDateTime } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
@@ -61,6 +62,8 @@ export default function RemindersIndex({ reminders, filters }: Props) {
     const [createOpen, setCreateOpen] = useState(false);
     const [editing, setEditing] = useState<Reminder | null>(null);
     const { refreshing } = useRefreshing();
+    const navigating = useNavigating();
+    const loading = refreshing || navigating;
 
     return (
         <>
@@ -101,7 +104,7 @@ export default function RemindersIndex({ reminders, filters }: Props) {
                 />
 
                 <div className="flex flex-col gap-3">
-                    {refreshing ? (
+                    {loading ? (
                         <ReminderSkeletonList />
                     ) : (
                         <>

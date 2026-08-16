@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigating } from '@/hooks/use-navigating';
 import { useRefreshing } from '@/hooks/use-refreshing';
 import { formatDate, formatMoney, formatPercent } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
@@ -44,6 +45,8 @@ type GoalForm = {
 export default function SavingsIndex({ goals, filters }: Props) {
     const [open, setOpen] = useState(false);
     const { refreshing } = useRefreshing();
+    const navigating = useNavigating();
+    const loading = refreshing || navigating;
 
     return (
         <>
@@ -83,7 +86,7 @@ export default function SavingsIndex({ goals, filters }: Props) {
                 />
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                    {refreshing ? (
+                    {loading ? (
                         <GoalSkeletonList />
                     ) : (
                         <>

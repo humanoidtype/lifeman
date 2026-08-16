@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import SecurityController from '@/actions/App/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { SettingsPageSkeleton } from '@/components/page-skeletons';
 import PasswordInput from '@/components/password-input';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +15,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
+import { useNavigating } from '@/hooks/use-navigating';
 import { edit } from '@/routes/security';
 
 type Props = {
@@ -23,6 +25,12 @@ type Props = {
 export default function Security(props: Props) {
     const passwordInput = useRef<HTMLInputElement>(null);
     const currentPasswordInput = useRef<HTMLInputElement>(null);
+
+    const navigating = useNavigating();
+
+    if (navigating) {
+        return <SettingsPageSkeleton />;
+    }
 
     return (
         <>

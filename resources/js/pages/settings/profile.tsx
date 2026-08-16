@@ -4,6 +4,7 @@ import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileCo
 import DeleteUser from '@/components/delete-user';
 import Heading from '@/components/heading';
 import InputError from '@/components/input-error';
+import { SettingsPageSkeleton } from '@/components/page-skeletons';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -14,6 +15,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useNavigating } from '@/hooks/use-navigating';
 import { cn } from '@/lib/utils';
 import { logout } from '@/routes';
 import { edit } from '@/routes/profile';
@@ -33,6 +35,12 @@ export default function Profile({
 }) {
     const { auth } = usePage<PageProps>().props;
     const verified = auth.user.email_verified_at !== null;
+
+    const navigating = useNavigating();
+
+    if (navigating) {
+        return <SettingsPageSkeleton />;
+    }
 
     return (
         <>

@@ -29,6 +29,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigating } from '@/hooks/use-navigating';
 import { useRefreshing } from '@/hooks/use-refreshing';
 import { formatMoney } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
@@ -78,6 +79,8 @@ type Props = {
 export default function Dashboard({ auth, stats, charts }: Props) {
     const firstName = auth.user.name.split(' ')[0];
     const { refreshing } = useRefreshing();
+    const navigating = useNavigating();
+    const loading = refreshing || navigating;
     const today = new Date().toLocaleDateString('id-ID', {
         weekday: 'long',
         day: 'numeric',
@@ -141,7 +144,7 @@ export default function Dashboard({ auth, stats, charts }: Props) {
                     </div>
                 </div>
 
-                {refreshing ? (
+                {loading ? (
                     <StatSkeletonGrid />
                 ) : (
                     <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -272,7 +275,7 @@ export default function Dashboard({ auth, stats, charts }: Props) {
                     />
                 </div>
 
-                {refreshing ? (
+                {loading ? (
                     <ChartSkeletonGrid />
                 ) : (
                     (charts.goalsProgress.length > 0 ||

@@ -2,10 +2,18 @@ import { Head } from '@inertiajs/react';
 import { Palette } from 'lucide-react';
 import AppearanceTabs from '@/components/appearance-tabs';
 import Heading from '@/components/heading';
+import { SettingsPageSkeleton } from '@/components/page-skeletons';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useNavigating } from '@/hooks/use-navigating';
 import { edit as editAppearance } from '@/routes/appearance';
 
 export default function Appearance() {
+    const navigating = useNavigating();
+
+    if (navigating) {
+        return <SettingsPageSkeleton />;
+    }
+
     return (
         <>
             <Head title="Tampilan" />

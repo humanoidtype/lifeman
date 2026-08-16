@@ -17,6 +17,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useNavigating } from '@/hooks/use-navigating';
 import { useRefreshing } from '@/hooks/use-refreshing';
 import { formatDate, formatMoney } from '@/lib/format';
 import { toUrl } from '@/lib/utils';
@@ -41,6 +42,8 @@ type CashflowForm = {
 export default function CashflowsIndex({ cashflows, filters }: Props) {
     const [open, setOpen] = useState(false);
     const { refreshing } = useRefreshing();
+    const navigating = useNavigating();
+    const loading = refreshing || navigating;
 
     return (
         <>
@@ -74,7 +77,7 @@ export default function CashflowsIndex({ cashflows, filters }: Props) {
                 />
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                    {refreshing ? (
+                    {loading ? (
                         <CashflowSkeletonList />
                     ) : (
                         <>

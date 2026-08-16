@@ -11,7 +11,7 @@ export type UpdateInfo = {
 
 const REPO = 'humanoidtype/lifeman';
 const CACHE_KEY = 'lifeman-update-check';
-const CACHE_TTL_MS = 6 * 60 * 60 * 1000;
+const CACHE_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 
 let inFlight: Promise<UpdateInfo> | null = null;
 

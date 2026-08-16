@@ -1,10 +1,11 @@
 import { createInertiaApp } from '@inertiajs/react';
 import { AppErrorBoundary } from '@/components/app-error-boundary';
-import { LoadingOverlay } from '@/components/loading-overlay';
+import { AppSplash } from '@/components/app-splash';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { useBackHandler } from '@/hooks/use-back-handler';
+import { NavigatingProvider } from '@/hooks/use-navigating';
 import { RefreshingProvider } from '@/hooks/use-refreshing';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
@@ -12,7 +13,11 @@ import GlobalChromeLayout from '@/layouts/global-chrome-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 import { initBootDiag } from '@/lib/diagnose';
 
-initBootDiag();
+const DIAGNOSE_ENABLED = import.meta.env.VITE_DIAGNOSE_ENABLED === 'true';
+
+if (DIAGNOSE_ENABLED) {
+    initBootDiag();
+}
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
@@ -37,19 +42,34 @@ createInertiaApp({
         }
     },
     strictMode: true,
-    withApp(app) {
+    withApp(app, { page }) {
+        const appVersion =
+            typeof page.props.appVersion === 'string'
+                ? page.props.appVersion
+                : undefined;
+
         return (
             <RefreshingProvider>
-                <TooltipProvider delayDuration={0}>
-                    <AppErrorBoundary label="APP">
-                        <AppErrorBoundary label="HALAMAN">
-                            {app}
-                        </AppErrorBoundary>
-                        <Toaster />
-                        <LoadingOverlay />
-                        <BackButtonHandler />
-                    </AppErrorBoundary>
-                </TooltipProvider>
+                <NavigatingProvider>
+                    <TooltipProvider delayDuration={0}>
+                        {DIAGNOSE_ENABLED ? (
+                            <AppErrorBoundary label="APP">
+                                <AppErrorBoundary label="HALAMAN">
+                                    {app}
+                                </AppErrorBoundary>
+                                <Toaster />
+                                <BackButtonHandler />
+                            </AppErrorBoundary>
+                        ) : (
+                            <>
+                                {app}
+                                <Toaster />
+                                <BackButtonHandler />
+                            </>
+                        )}
+                        <AppSplash appVersion={appVersion} />
+                    </TooltipProvider>
+                </NavigatingProvider>
             </RefreshingProvider>
         );
     },
