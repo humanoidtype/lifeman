@@ -3,7 +3,7 @@ import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 
 const NAVIGATION_DELAY_MS = 250;
-const MIN_DISPLAY_MS = 1000;
+const MIN_DISPLAY_MS = 400;
 
 const NavigatingContext = createContext(false);
 
