@@ -48,6 +48,9 @@ jobs:
             - name: Add Android platform
               run: npx cap add android
 
+            - name: Generate splash image
+              run: node scripts/generate-splash.mjs android/app/src/main/res/drawable/splash.png
+
             - name: Sync Capacitor
               run: npx cap sync android
 
