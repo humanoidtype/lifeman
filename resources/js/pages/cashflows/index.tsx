@@ -16,6 +16,8 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useRefreshing } from '@/hooks/use-refreshing';
 import { formatDate, formatMoney } from '@/lib/format';
 import { toUrl } from '@/lib/utils';
 import { show, store, index } from '@/routes/cashflows';
@@ -38,6 +40,7 @@ type CashflowForm = {
 
 export default function CashflowsIndex({ cashflows, filters }: Props) {
     const [open, setOpen] = useState(false);
+    const { refreshing } = useRefreshing();
 
     return (
         <>
@@ -71,21 +74,66 @@ export default function CashflowsIndex({ cashflows, filters }: Props) {
                 />
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                    {cashflows.data.length === 0 && (
-                        <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
-                            Tidak ada catatan kas yang cocok.
-                        </p>
-                    )}
+                    {refreshing ? (
+                        <CashflowSkeletonList />
+                    ) : (
+                        <>
+                            {cashflows.data.length === 0 && (
+                                <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
+                                    Tidak ada catatan kas yang cocok.
+                                </p>
+                            )}
 
-                    {cashflows.data.map((cashflow) => (
-                        <CashflowCard key={cashflow.id} cashflow={cashflow} />
-                    ))}
+                            {cashflows.data.map((cashflow) => (
+                                <CashflowCard
+                                    key={cashflow.id}
+                                    cashflow={cashflow}
+                                />
+                            ))}
+                        </>
+                    )}
                 </div>
 
                 <Pagination links={cashflows.links} />
             </div>
 
+            {refreshing && (
+                <div className="sr-only" role="status" aria-live="polite">
+                    Memperbarui data...
+                </div>
+            )}
+
             <CashflowFormDialog open={open} onOpenChange={setOpen} />
+        </>
+    );
+}
+
+function CashflowSkeletonList() {
+    return (
+        <>
+            {Array.from({ length: 4 }, (_, index) => (
+                <Card key={index} className="border-border/60">
+                    <CardHeader className="pb-3">
+                        <div className="flex items-center justify-between gap-2">
+                            <div className="flex items-center gap-2">
+                                <Skeleton className="size-4 rounded-md" />
+                                <Skeleton className="h-4 w-32" />
+                            </div>
+                            <Skeleton className="h-5 w-16 rounded-full" />
+                        </div>
+                    </CardHeader>
+                    <CardContent className="grid gap-2">
+                        <div className="flex items-baseline justify-between">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-3 w-24" />
+                        </div>
+                        <div className="flex items-center justify-between">
+                            <Skeleton className="h-3 w-20" />
+                            <Skeleton className="h-3 w-20" />
+                        </div>
+                    </CardContent>
+                </Card>
+            ))}
         </>
     );
 }

@@ -1,11 +1,18 @@
 import { router } from '@inertiajs/react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useRefreshing } from '@/hooks/use-refreshing';
 
 const SHOW_DELAY_MS = 400;
 const SAFETY_TIMEOUT_MS = 15_000;
 
 export function LoadingOverlay() {
     const [visible, setVisible] = useState(false);
+    const { refreshing } = useRefreshing();
+    const refreshingRef = useRef(refreshing);
+
+    useEffect(() => {
+        refreshingRef.current = refreshing;
+    }, [refreshing]);
 
     useEffect(() => {
         let timer: number | undefined;
@@ -18,6 +25,10 @@ export function LoadingOverlay() {
         };
 
         const start = (): void => {
+            if (refreshingRef.current) {
+                return;
+            }
+
             finish();
             timer = window.setTimeout(() => setVisible(true), SHOW_DELAY_MS);
             safetyTimer = window.setTimeout(finish, SAFETY_TIMEOUT_MS);

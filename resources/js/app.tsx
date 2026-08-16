@@ -4,6 +4,8 @@ import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { initializeTheme } from '@/hooks/use-appearance';
 import { useBackHandler } from '@/hooks/use-back-handler';
+import { useFreshData } from '@/hooks/use-fresh-data';
+import { RefreshingProvider } from '@/hooks/use-refreshing';
 import AppLayout from '@/layouts/app-layout';
 import AuthLayout from '@/layouts/auth-layout';
 import SettingsLayout from '@/layouts/settings/layout';
@@ -12,6 +14,12 @@ const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
 function BackButtonHandler() {
     useBackHandler();
+
+    return null;
+}
+
+function FreshDataHandler() {
+    useFreshData();
 
     return null;
 }
@@ -33,12 +41,15 @@ createInertiaApp({
     strictMode: true,
     withApp(app) {
         return (
-            <TooltipProvider delayDuration={0}>
-                {app}
-                <Toaster />
-                <LoadingOverlay />
-                <BackButtonHandler />
-            </TooltipProvider>
+            <RefreshingProvider>
+                <TooltipProvider delayDuration={0}>
+                    {app}
+                    <Toaster />
+                    <LoadingOverlay />
+                    <BackButtonHandler />
+                    <FreshDataHandler />
+                </TooltipProvider>
+            </RefreshingProvider>
         );
     },
     progress: false,
