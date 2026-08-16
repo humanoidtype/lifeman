@@ -57,16 +57,26 @@ Route::get('/app/update-check', function () {
             return ['error' => 'HTTP '.$response->status()];
         }
 
-        $release = $response->json();
-        $downloadAsset = collect($release['assets'] ?? [])->first(
-            fn ($asset) => str_ends_with((string) ($asset['name'] ?? ''), '.apk'),
-        );
+        $data = $response->json();
+        $release = is_array($data) ? $data : [];
+        $downloadUrl = null;
+
+        foreach ($release['assets'] ?? [] as $asset) {
+            if (
+                is_array($asset)
+                && str_ends_with((string) ($asset['name'] ?? ''), '.apk')
+            ) {
+                $downloadUrl = $asset['browser_download_url'] ?? null;
+
+                break;
+            }
+        }
 
         return [
             'tag_name' => $release['tag_name'] ?? null,
             'body' => $release['body'] ?? null,
             'html_url' => $release['html_url'] ?? null,
-            'download_url' => $downloadAsset['browser_download_url'] ?? null,
+            'download_url' => $downloadUrl,
         ];
     });
 
