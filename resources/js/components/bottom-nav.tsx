@@ -53,7 +53,7 @@ export function BottomNav() {
 
     return (
         <nav className="fixed inset-x-0 bottom-4 z-50 flex justify-center px-4">
-            <div className="flex items-center gap-1 rounded-full border border-border/70 bg-background/95 p-1.5 shadow-xl shadow-black/10 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+            <div className="flex items-center gap-1 rounded-full border border-border bg-background p-1.5 shadow-sm">
                 {items.map((item) => (
                     <Link
                         key={item.title}
@@ -61,9 +61,9 @@ export function BottomNav() {
                         prefetch="mount"
                         cacheFor={CACHE_FOR}
                         className={cn(
-                            'flex flex-col items-center gap-0.5 rounded-full px-3.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-all duration-200 hover:-translate-y-0.5 hover:text-foreground sm:px-5',
+                            'flex flex-col items-center gap-0.5 rounded-full px-3.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-colors duration-200 hover:text-foreground sm:px-5',
                             isActive(toUrl(item.href)) &&
-                                'bg-primary text-primary-foreground shadow-md shadow-primary/25 hover:text-primary-foreground',
+                                'bg-primary text-primary-foreground hover:text-primary-foreground',
                         )}
                     >
                         <item.icon className="size-5" />

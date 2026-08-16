@@ -41,7 +41,7 @@ export default function Welcome() {
             <div className="flex min-h-dvh flex-col p-6 lg:justify-center lg:p-8">
                 <header className="mx-auto mb-10 flex w-full max-w-3xl items-center justify-between">
                     <span className="flex items-center gap-2 font-semibold tracking-tight">
-                        <span className="flex size-7 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/60 text-primary-foreground shadow-sm">
+                        <span className="flex size-7 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
                             <Sparkles className="size-4" />
                         </span>
                         Life Man
@@ -66,14 +66,16 @@ export default function Welcome() {
                 </header>
 
                 <main className="mx-auto flex w-full max-w-3xl flex-col gap-10">
-                    <div className="flex flex-col items-center gap-4 text-center">
+                    <div className="flex flex-col items-center gap-3 text-center">
                         <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/30 bg-primary/5 px-3 py-1 text-xs font-medium text-primary">
                             <Sparkles className="size-3.5" />
                             Kelola hidupmu, lebih tenang
                         </span>
                         <h1 className="max-w-2xl text-4xl font-extrabold tracking-tight sm:text-5xl">
                             Hidup{' '}
-                            <span className="text-gradient">lebih teratur</span>{' '}
+                            <span className="text-amber-600 dark:text-amber-400">
+                                lebih teratur
+                            </span>{' '}
                             dengan Life Man
                         </h1>
                         <p className="max-w-xl text-sm text-muted-foreground sm:text-base">
@@ -127,7 +129,7 @@ export default function Welcome() {
                             >
                                 <Card className="h-full transition-all duration-200 group-hover:-translate-y-1 group-hover:border-primary/50 group-hover:shadow-lg">
                                     <CardHeader className="pb-2">
-                                        <div className="mb-2 flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/60 text-primary-foreground shadow-sm transition-transform duration-200 group-hover:scale-110">
+                                        <div className="mb-2 flex size-10 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-sm transition-transform duration-200 group-hover:scale-110">
                                             <feature.icon className="size-5" />
                                         </div>
                                         <CardTitle className="flex items-center gap-2 text-base">

@@ -40,7 +40,7 @@ export default function Profile({
 
             <h1 className="sr-only">Pengaturan profil</h1>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
                 <Heading
                     variant="small"
                     title="Profil"
@@ -48,7 +48,7 @@ export default function Profile({
                 />
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <User className="size-4" />
                         </span>
@@ -59,13 +59,13 @@ export default function Profile({
                             </CardDescription>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5">
+                    <CardContent className="p-4">
                         <Form
                             {...ProfileController.update.form()}
                             options={{
                                 preserveScroll: true,
                             }}
-                            className="space-y-4"
+                            className="space-y-3"
                         >
                             {({ processing, errors }) => (
                                 <>
@@ -88,7 +88,7 @@ export default function Profile({
 
                                     <Button
                                         disabled={processing}
-                                        className="rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                                        className="rounded-xl bg-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5"
                                         data-test="update-profile-button"
                                     >
                                         Simpan
@@ -100,7 +100,7 @@ export default function Profile({
                 </Card>
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Mail className="size-4" />
                         </span>
@@ -128,7 +128,7 @@ export default function Profile({
                             {verified ? 'Terverifikasi' : 'Belum terverifikasi'}
                         </span>
                     </CardHeader>
-                    <CardContent className="space-y-4 p-5">
+                    <CardContent className="space-y-3 p-4">
                         <p className="text-sm font-medium">{auth.user.email}</p>
 
                         {mustVerifyEmail && !verified && (
@@ -164,7 +164,7 @@ export default function Profile({
                 </Card>
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-muted text-muted-foreground">
                             <LogOut className="size-4" />
                         </span>
@@ -175,7 +175,7 @@ export default function Profile({
                             </CardDescription>
                         </div>
                     </CardHeader>
-                    <CardContent className="grid gap-3 p-5 sm:grid-cols-2">
+                    <CardContent className="grid gap-3 p-4 sm:grid-cols-2">
                         <Button
                             asChild
                             variant="secondary"

@@ -84,7 +84,7 @@ export default function About() {
 
             <h1 className="sr-only">Versi aplikasi</h1>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
                 <Heading
                     variant="small"
                     title="Versi App"
@@ -92,7 +92,7 @@ export default function About() {
                 />
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Info className="size-4" />
                         </span>
@@ -102,8 +102,8 @@ export default function About() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5">
-                        <div className="flex items-center gap-4">
+                    <CardContent className="p-4">
+                        <div className="flex items-center gap-3">
                             <AppLogoIcon className="size-14 rounded-2xl" />
                             <div className="min-w-0">
                                 <p className="text-lg font-semibold">
@@ -121,7 +121,7 @@ export default function About() {
                 </Card>
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Download className="size-4" />
                         </span>
@@ -131,7 +131,7 @@ export default function About() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="space-y-4 p-5">
+                    <CardContent className="space-y-3 p-4">
                         {checking ? (
                             <div className="flex items-center gap-2 text-sm text-muted-foreground">
                                 <LoaderCircle className="size-4 animate-spin" />
@@ -215,7 +215,7 @@ export default function About() {
                 </Card>
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Download className="size-4" />
                         </span>
@@ -225,7 +225,7 @@ export default function About() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5">
+                    <CardContent className="p-4">
                         {update?.changelog ? (
                             <div className="space-y-3">
                                 <p className="text-sm font-medium text-muted-foreground">
@@ -256,7 +256,7 @@ export default function About() {
                 </Card>
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Heart className="size-4" />
                         </span>
@@ -266,7 +266,7 @@ export default function About() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="space-y-3 p-5">
+                    <CardContent className="space-y-3 p-4">
                         <p className="text-sm text-muted-foreground">
                             Suka menggunakan {APP_NAME}? Dukung pengembangan{' '}
                             {APP_NAME} melalui Saweria.

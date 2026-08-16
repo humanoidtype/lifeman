@@ -122,7 +122,7 @@ export default function SavingsShow({ goal, payments }: Props) {
         <>
             <Head title={goal.title} />
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
                         {goal.title}
@@ -174,7 +174,7 @@ export default function SavingsShow({ goal, payments }: Props) {
                 </div>
 
                 <Card>
-                    <CardContent className="grid gap-3 p-5">
+                    <CardContent className="grid gap-3 p-4">
                         <div className="flex items-baseline justify-between text-sm">
                             <span className="font-semibold">
                                 {formatPercent(percent)}
@@ -191,7 +191,7 @@ export default function SavingsShow({ goal, payments }: Props) {
                                         ? 'bg-emerald-500'
                                         : missed
                                           ? 'bg-destructive'
-                                          : 'bg-gradient-to-r from-primary to-primary/60',
+                                          : 'bg-primary',
                                 )}
                                 style={{ width: `${Math.min(percent, 100)}%` }}
                             />
@@ -419,7 +419,7 @@ function EditPaymentDialog({
                     <DialogTitle>Edit Cicilan</DialogTitle>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-2">
+                <div className="grid gap-3 py-2">
                     <div className="grid gap-2">
                         <Label htmlFor="edit-amount">Nominal</Label>
                         <Input

@@ -46,8 +46,8 @@ export default function SavingsIndex({ goals, filters }: Props) {
         <>
             <Head title="Nabung" />
 
-            <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-3">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
                             Ingatkan Nabung
@@ -79,7 +79,7 @@ export default function SavingsIndex({ goals, filters }: Props) {
                     ]}
                 />
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-3 sm:grid-cols-2">
                     <>
                         {goals.data.length === 0 && (
                             <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
@@ -166,7 +166,7 @@ function GoalCard({ goal }: { goal: SavingsGoal }) {
                                     ? 'bg-emerald-500'
                                     : missed
                                       ? 'bg-destructive'
-                                      : 'bg-gradient-to-r from-primary to-primary/60',
+                                      : 'bg-primary',
                             )}
                             style={{ width: `${Math.min(percent, 100)}%` }}
                         />
@@ -255,7 +255,7 @@ function GoalFormDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-2">
+                <div className="grid gap-3 py-2">
                     <div className="grid gap-2">
                         <Label htmlFor="goal-title">Judul target</Label>
                         <Input

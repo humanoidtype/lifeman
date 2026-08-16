@@ -30,7 +30,7 @@ export default function Security(props: Props) {
 
             <h1 className="sr-only">Pengaturan keamanan</h1>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
                 <Heading
                     variant="small"
                     title="Keamanan"
@@ -38,7 +38,7 @@ export default function Security(props: Props) {
                 />
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <KeyRound className="size-4" />
                         </span>
@@ -51,7 +51,7 @@ export default function Security(props: Props) {
                             </CardDescription>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5">
+                    <CardContent className="p-4">
                         <Form
                             {...SecurityController.update.form()}
                             options={{
@@ -72,7 +72,7 @@ export default function Security(props: Props) {
                                     currentPasswordInput.current?.focus();
                                 }
                             }}
-                            className="space-y-4"
+                            className="space-y-3"
                         >
                             {({ errors, processing }) => (
                                 <>
@@ -144,10 +144,10 @@ export default function Security(props: Props) {
                                         </p>
                                     </div>
 
-                                    <div className="flex items-center gap-4 pt-1">
+                                    <div className="flex items-center gap-3 pt-1">
                                         <Button
                                             disabled={processing}
-                                            className="rounded-xl bg-gradient-to-br from-primary to-primary/80 shadow-md shadow-primary/20 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+                                            className="rounded-xl bg-primary shadow-sm transition-all duration-200 hover:-translate-y-0.5"
                                             data-test="update-password-button"
                                         >
                                             Simpan password

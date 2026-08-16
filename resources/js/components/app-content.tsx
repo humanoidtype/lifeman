@@ -24,7 +24,7 @@ export function AppContent({
     return (
         <main
             className={cn(
-                'mx-auto flex h-full w-full max-w-7xl flex-1 flex-col gap-4 rounded-xl px-4 md:px-6 lg:px-8',
+                'mx-auto flex h-full w-full max-w-5xl flex-1 flex-col gap-3 rounded-xl px-3 md:px-4 lg:px-5',
                 className,
             )}
             {...props}

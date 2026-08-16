@@ -81,7 +81,7 @@ export default function Notifications() {
         <>
             <Head title="Notifikasi" />
 
-            <div className="space-y-6">
+            <div className="space-y-4">
                 <Heading
                     variant="small"
                     title="Notifikasi"
@@ -89,7 +89,7 @@ export default function Notifications() {
                 />
 
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Bell className="size-4" />
                         </span>
@@ -99,7 +99,7 @@ export default function Notifications() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="grid gap-3 p-5">
+                    <CardContent className="grid gap-3 p-4">
                         {SOUNDS.map((sound) => {
                             const isSelected = selected === sound.id;
                             const isDefault = sound.id === 'default';
@@ -120,7 +120,7 @@ export default function Notifications() {
                                             className={cn(
                                                 'flex size-9 shrink-0 items-center justify-center rounded-lg',
                                                 isSelected
-                                                    ? 'bg-gradient-to-br from-primary to-primary/60 text-primary-foreground shadow-sm'
+                                                    ? 'bg-primary text-primary-foreground shadow-sm'
                                                     : 'bg-muted text-muted-foreground',
                                             )}
                                         >

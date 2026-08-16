@@ -43,8 +43,8 @@ export default function CashflowsIndex({ cashflows, filters }: Props) {
         <>
             <Head title="Kas" />
 
-            <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-3">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
                             Kas
@@ -70,7 +70,7 @@ export default function CashflowsIndex({ cashflows, filters }: Props) {
                     sortPlaceholder="Terbaru"
                 />
 
-                <div className="grid gap-4 sm:grid-cols-2">
+                <div className="grid gap-3 sm:grid-cols-2">
                     <>
                         {cashflows.data.length === 0 && (
                             <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
@@ -191,7 +191,7 @@ function CashflowFormDialog({
                     </DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-2">
+                <div className="grid gap-3 py-2">
                     <div className="grid gap-2">
                         <Label htmlFor="cashflow-title">Judul kas</Label>
                         <Input

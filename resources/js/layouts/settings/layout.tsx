@@ -1,5 +1,5 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Bell, ChevronRight, Info, Lock, Palette, User } from 'lucide-react';
+import { Bell, Info, Lock, Palette, User } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
 import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
@@ -62,16 +62,16 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
     }, [appVersion]);
 
     return (
-        <div className="px-4 py-6">
+        <div className="px-3 py-4">
             <Heading
                 title="Pengaturan"
                 description="Kelola profil, keamanan, dan preferensi akunmu"
             />
 
-            <div className="flex flex-col gap-6 lg:flex-row lg:gap-12">
+            <div className="flex flex-col gap-4 lg:flex-row lg:gap-12">
                 <aside className="w-full shrink-0 lg:w-64">
                     <nav
-                        className="flex flex-col gap-1 rounded-2xl border bg-card p-2 shadow-sm"
+                        className="grid grid-cols-3 gap-2 rounded-2xl border bg-card p-2 shadow-sm"
                         aria-label="Pengaturan"
                     >
                         {sidebarNavItems.map((item) => {
@@ -81,55 +81,38 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                 <Link
                                     key={toUrl(item.href)}
                                     href={item.href}
+                                    prefetch="mount"
+                                    cacheFor="60s"
                                     className={cn(
-                                        'flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all duration-200',
+                                        'relative flex flex-col items-center gap-1.5 rounded-xl px-1 py-3 text-center text-[11px] font-medium transition-colors duration-200',
                                         active
-                                            ? 'bg-primary/10 text-foreground'
-                                            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                                            ? 'bg-primary text-primary-foreground'
+                                            : 'bg-muted text-muted-foreground hover:bg-accent hover:text-foreground',
                                     )}
                                 >
                                     {item.icon && (
-                                        <span
-                                            className={cn(
-                                                'flex size-8 shrink-0 items-center justify-center rounded-lg transition-all duration-200',
-                                                active
-                                                    ? 'bg-gradient-to-br from-primary to-primary/60 text-primary-foreground shadow-sm'
-                                                    : 'bg-muted text-muted-foreground',
-                                            )}
-                                        >
-                                            <item.icon className="size-4" />
-                                        </span>
+                                        <item.icon className="size-5" />
                                     )}
-                                    <span className="flex-1 text-sm font-medium">
-                                        {item.title}
-                                    </span>
+                                    <span>{item.title}</span>
                                     {item.title === 'Versi App' &&
                                         update?.updateAvailable && (
                                             <span
-                                                className="size-2 shrink-0 rounded-full bg-destructive"
+                                                className="absolute top-1.5 right-1.5 size-2 rounded-full bg-destructive"
                                                 aria-label="Update tersedia"
                                             />
                                         )}
-                                    <ChevronRight
-                                        className={cn(
-                                            'size-4 transition-all duration-200',
-                                            active
-                                                ? 'translate-x-0 text-primary'
-                                                : '-translate-x-1 text-muted-foreground/50 group-hover:translate-x-0',
-                                        )}
-                                    />
                                 </Link>
                             );
                         })}
                     </nav>
 
-                    <p className="mt-6 text-center text-xs text-muted-foreground">
+                    <p className="mt-4 text-center text-xs text-muted-foreground">
                         Life Man v{appVersion}
                     </p>
                 </aside>
 
                 <div className="flex-1 md:max-w-2xl">
-                    <section className="max-w-xl space-y-6">{children}</section>
+                    <section className="max-w-xl space-y-4">{children}</section>
                 </div>
             </div>
         </div>

@@ -93,18 +93,19 @@ export default function Dashboard({ auth, stats, charts }: Props) {
         <>
             <Head title="Beranda" />
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-3">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
-                        Halo, <span className="text-gradient">{firstName}</span>
+                        Halo,{' '}
+                        <span className="text-amber-600 dark:text-amber-400">
+                            {firstName}
+                        </span>
                     </h1>
                     <p className="text-sm text-muted-foreground">{today}</p>
                 </div>
 
-                <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary to-primary/80 p-5 text-primary-foreground shadow-lg shadow-primary/20">
-                    <div className="pointer-events-none absolute -top-16 -right-16 size-48 rounded-full bg-white/15 blur-2xl" />
-                    <div className="pointer-events-none absolute -bottom-20 -left-10 size-40 rounded-full bg-black/10 blur-2xl" />
-                    <div className="relative flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div className="rounded-2xl bg-primary p-4 text-primary-foreground">
+                    <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                         <div>
                             <p className="text-sm font-medium opacity-80">
                                 Apa yang mau kamu kelola hari ini?
@@ -138,7 +139,7 @@ export default function Dashboard({ auth, stats, charts }: Props) {
                     </div>
                 </div>
 
-                <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="grid grid-cols-2 gap-2 xl:grid-cols-4">
                     <Card
                         className={cn(
                             'h-full',
@@ -150,7 +151,7 @@ export default function Dashboard({ auth, stats, charts }: Props) {
                             <div className="mb-2 flex items-center justify-between">
                                 <div
                                     className={cn(
-                                        'flex size-9 items-center justify-center rounded-xl',
+                                        'flex size-8 items-center justify-center rounded-xl',
                                         stats.overdueReminders > 0
                                             ? 'bg-destructive/10 text-destructive'
                                             : 'bg-primary/10 text-primary',
@@ -170,46 +171,46 @@ export default function Dashboard({ auth, stats, charts }: Props) {
                             <p className="text-sm text-muted-foreground">
                                 Ingetin aktif
                             </p>
-                            <CardTitle className="text-3xl">
+                            <CardTitle className="text-2xl">
                                 {stats.pendingReminders}
                             </CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="h-full">
                         <CardHeader className="pb-2">
-                            <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                            <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-muted text-foreground">
                                 <Target className="size-4" />
                             </div>
                             <p className="text-sm text-muted-foreground">
                                 Target nabung aktif
                             </p>
-                            <CardTitle className="text-3xl">
+                            <CardTitle className="text-2xl">
                                 {stats.activeGoals}
                             </CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="h-full">
                         <CardHeader className="pb-2">
-                            <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                            <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-muted text-foreground">
                                 <Wallet className="size-4" />
                             </div>
                             <p className="text-sm text-muted-foreground">
                                 Total terkumpul
                             </p>
-                            <CardTitle className="text-3xl">
+                            <CardTitle className="text-2xl">
                                 {formatMoney(stats.savedAmount)}
                             </CardTitle>
                         </CardHeader>
                     </Card>
                     <Card className="h-full">
                         <CardHeader className="pb-2">
-                            <div className="mb-2 flex size-9 items-center justify-center rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                            <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-muted text-foreground">
                                 <Wallet className="size-4" />
                             </div>
                             <p className="text-sm text-muted-foreground">
                                 Netto kas terakhir
                             </p>
-                            <CardTitle className="text-3xl">
+                            <CardTitle className="text-2xl">
                                 {stats.latestCashflow
                                     ? formatMoney(cashflowNetto)
                                     : '—'}
@@ -493,7 +494,7 @@ function FeatureCard({
         >
             <Card className="h-full transition-all duration-200 group-hover:-translate-y-1 group-hover:border-primary/50 group-hover:shadow-lg">
                 <CardHeader className="pb-2">
-                    <div className="mb-2 flex size-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary to-primary/60 text-primary-foreground shadow-sm transition-transform duration-200 group-hover:scale-110">
+                    <div className="mb-2 flex size-8 items-center justify-center rounded-xl bg-muted text-foreground transition-transform duration-200 group-hover:scale-110">
                         <Icon className="size-5" />
                     </div>
                     <CardTitle className="flex items-center gap-2 text-base">

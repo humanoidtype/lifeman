@@ -102,7 +102,9 @@ export function AppSplash({ appVersion }: { appVersion?: string }) {
                 <AppLogoIcon className="size-24 drop-shadow-lg" />
             </div>
             <div className="flex flex-col items-center gap-1 text-center">
-                <p className="text-2xl font-bold tracking-tight">{APP_NAME}</p>
+                <p className="text-2xl font-bold tracking-tight text-amber-400">
+                    {APP_NAME}
+                </p>
                 <p className="text-sm opacity-80">Versi {appVersion}</p>
             </div>
             <div className="flex items-center gap-2 text-xs font-medium opacity-90">

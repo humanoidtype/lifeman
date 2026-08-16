@@ -68,7 +68,7 @@ export default function CashflowsShow({ cashflow, items }: Props) {
         <>
             <Head title={cashflow.title} />
 
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-4">
                 <div>
                     <h1 className="text-2xl font-bold tracking-tight">
                         {cashflow.title}
@@ -446,7 +446,7 @@ function EditItemDialog({
                     <DialogTitle>Edit Item</DialogTitle>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-2">
+                <div className="grid gap-3 py-2">
                     <div className="grid gap-2">
                         <Label htmlFor="edit-name">Nama</Label>
                         <Input

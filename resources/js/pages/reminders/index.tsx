@@ -63,8 +63,8 @@ export default function RemindersIndex({ reminders, filters }: Props) {
         <>
             <Head title="Ingetin" />
 
-            <div className="flex flex-col gap-6">
-                <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col gap-4">
+                <div className="flex items-center justify-between gap-3">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
                             Ingetin
@@ -276,7 +276,7 @@ function ReminderFormDialog({
                     <DialogDescription>{description}</DialogDescription>
                 </DialogHeader>
 
-                <div className="grid gap-4 py-2">
+                <div className="grid gap-3 py-2">
                     <div className="grid gap-2">
                         <Label htmlFor="reminder-title">Judul</Label>
                         <Input

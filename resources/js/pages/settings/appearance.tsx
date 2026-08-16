@@ -12,14 +12,14 @@ export default function Appearance() {
 
             <h1 className="sr-only">Pengaturan tampilan</h1>
 
-            <div className="space-y-6">
+            <div className="space-y-4">
                 <Heading
                     variant="small"
                     title="Tampilan"
                     description="Pilih tema yang paling nyaman untukmu"
                 />
                 <Card className="overflow-hidden rounded-2xl">
-                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-5 py-4">
+                    <CardHeader className="flex flex-row items-center gap-3 space-y-0 border-b px-4 py-4">
                         <span className="flex size-9 items-center justify-center rounded-xl bg-primary/10 text-primary">
                             <Palette className="size-4" />
                         </span>
@@ -29,7 +29,7 @@ export default function Appearance() {
                             </CardTitle>
                         </div>
                     </CardHeader>
-                    <CardContent className="p-5">
+                    <CardContent className="p-4">
                         <AppearanceTabs />
                     </CardContent>
                 </Card>
