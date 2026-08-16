@@ -153,6 +153,11 @@ export default function About() {
                                     Tidak dapat memeriksa pembaruan. Pastikan
                                     koneksi internetmu aktif.
                                 </div>
+                                {update.errorMessage && (
+                                    <p className="text-xs text-muted-foreground">
+                                        Detail: {update.errorMessage}
+                                    </p>
+                                )}
                                 <Button
                                     variant="outline"
                                     size="sm"
@@ -251,7 +256,9 @@ export default function About() {
                             </div>
                         ) : (
                             <p className="text-sm text-muted-foreground">
-                                Belum ada changelog untuk versi ini.
+                                {update?.failed
+                                    ? 'Changelog tidak tersedia — periksa pembaruan gagal.'
+                                    : 'Belum ada changelog untuk versi ini.'}
                             </p>
                         )}
                     </CardContent>

@@ -1,28 +1,51 @@
 import { router } from '@inertiajs/react';
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useRef, useState } from 'react';
 import type { PropsWithChildren } from 'react';
 
 const NAVIGATION_DELAY_MS = 250;
+const MIN_DISPLAY_MS = 1000;
 
 const NavigatingContext = createContext(false);
 
 export function NavigatingProvider({ children }: PropsWithChildren) {
     const [navigating, setNavigating] = useState(false);
+    const shownAtRef = useRef(0);
+    const hideTimerRef = useRef<number | undefined>(undefined);
 
     useEffect(() => {
-        let timer: number | undefined;
+        let showTimer: number | undefined;
 
         const start = (): void => {
-            window.clearTimeout(timer);
-            timer = window.setTimeout(
-                () => setNavigating(true),
-                NAVIGATION_DELAY_MS,
-            );
+            window.clearTimeout(showTimer);
+            window.clearTimeout(hideTimerRef.current);
+            showTimer = window.setTimeout(() => {
+                shownAtRef.current = Date.now();
+                setNavigating(true);
+            }, NAVIGATION_DELAY_MS);
         };
 
         const finish = (): void => {
-            window.clearTimeout(timer);
-            setNavigating(false);
+            window.clearTimeout(showTimer);
+
+            if (shownAtRef.current === 0) {
+                setNavigating(false);
+
+                return;
+            }
+
+            const remaining =
+                MIN_DISPLAY_MS - (Date.now() - shownAtRef.current);
+
+            if (remaining <= 0) {
+                setNavigating(false);
+
+                return;
+            }
+
+            hideTimerRef.current = window.setTimeout(() => {
+                setNavigating(false);
+                shownAtRef.current = 0;
+            }, remaining);
         };
 
         const offStart = router.on('start', start);
@@ -33,7 +56,8 @@ export function NavigatingProvider({ children }: PropsWithChildren) {
         const offNetworkError = router.on('networkError', finish);
 
         return () => {
-            window.clearTimeout(timer);
+            window.clearTimeout(showTimer);
+            window.clearTimeout(hideTimerRef.current);
             offStart();
             offFinish();
             offError();

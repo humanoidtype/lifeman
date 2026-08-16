@@ -9,6 +9,8 @@ use App\Models\Cashflow;
 use App\Models\Reminder;
 use App\Models\SavingsGoal;
 use App\Models\SavingsPayment;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -41,6 +43,39 @@ Route::get('/diagnose-assets', function () {
         'ok' => $missing === [],
     ]);
 })->name('diagnose-assets');
+
+Route::get('/app/update-check', function () {
+    $response = Cache::remember('update-check', 600, function () {
+        $response = Http::timeout(8)
+            ->withHeaders([
+                'Accept' => 'application/vnd.github+json',
+                'User-Agent' => 'LifeMan/1.0',
+            ])
+            ->get('https://api.github.com/repos/humanoidtype/lifeman/releases/latest');
+
+        if ($response->failed()) {
+            return ['error' => 'HTTP '.$response->status()];
+        }
+
+        $release = $response->json();
+        $downloadAsset = collect($release['assets'] ?? [])->first(
+            fn ($asset) => str_ends_with((string) ($asset['name'] ?? ''), '.apk'),
+        );
+
+        return [
+            'tag_name' => $release['tag_name'] ?? null,
+            'body' => $release['body'] ?? null,
+            'html_url' => $release['html_url'] ?? null,
+            'download_url' => $downloadAsset['browser_download_url'] ?? null,
+        ];
+    });
+
+    if (isset($response['error'])) {
+        return response()->json($response, 502);
+    }
+
+    return response()->json($response);
+})->name('update-check');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {

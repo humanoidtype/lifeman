@@ -5,8 +5,8 @@ import { checkAssets } from '@/lib/asset-check';
 import { cn } from '@/lib/utils';
 
 const APP_NAME = import.meta.env.VITE_APP_NAME || 'Life Man';
-const MIN_DURATION_MS = 1600;
-const CHECK_TIMEOUT_MS = 4000;
+const MIN_DURATION_MS = 3000;
+const CHECK_TIMEOUT_MS = 3000;
 const FADE_DURATION_MS = 400;
 const RELOAD_FLAG_KEY = 'lifeman-asset-reload';
 
@@ -70,6 +70,20 @@ export function AppSplash({ appVersion }: { appVersion?: string }) {
         };
     }, []);
 
+    useEffect(() => {
+        if (phase === 'hidden') {
+            document.documentElement.style.backgroundColor = '';
+
+            return;
+        }
+
+        document.documentElement.style.backgroundColor = '#000';
+
+        return () => {
+            document.documentElement.style.backgroundColor = '';
+        };
+    }, [phase]);
+
     if (phase === 'hidden') {
         return null;
     }
@@ -80,7 +94,7 @@ export function AppSplash({ appVersion }: { appVersion?: string }) {
             aria-live="polite"
             aria-label={`Memuat ${APP_NAME}`}
             className={cn(
-                'pointer-events-none fixed inset-0 z-[200] flex flex-col items-center justify-center gap-8 bg-gradient-to-br from-primary to-primary/80 text-primary-foreground transition-opacity duration-500',
+                'pointer-events-none fixed inset-0 z-[200] flex flex-col items-center justify-center gap-8 bg-black text-white transition-opacity duration-500',
                 phase === 'fading' && 'opacity-0',
             )}
         >
