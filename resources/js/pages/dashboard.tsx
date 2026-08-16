@@ -21,7 +21,13 @@ import { Bar, Line } from 'react-chartjs-2';
 import { NettoBadge } from '@/components/netto-badge';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { formatMoney } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';

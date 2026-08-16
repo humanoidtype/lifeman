@@ -112,8 +112,16 @@ export default function CashflowsShow({ cashflow, items }: Props) {
                     </Card>
                 </div>
 
-                <IncomeSection cashflowId={cashflow.id} items={incomeItems} onEdit={setEditing} />
-                <ExpenseSection cashflowId={cashflow.id} items={expenseItems} onEdit={setEditing} />
+                <IncomeSection
+                    cashflowId={cashflow.id}
+                    items={incomeItems}
+                    onEdit={setEditing}
+                />
+                <ExpenseSection
+                    cashflowId={cashflow.id}
+                    items={expenseItems}
+                    onEdit={setEditing}
+                />
             </div>
 
             {editing && (
@@ -135,13 +143,14 @@ function IncomeSection({
     items: CashflowItem[];
     onEdit: (item: CashflowItem) => void;
 }) {
-    const { data, setData, errors, processing, post, reset } =
-        useForm<AddForm>({
+    const { data, setData, errors, processing, post, reset } = useForm<AddForm>(
+        {
             type: 'income',
             name: '',
             amount: '',
             quantity: '1',
-        });
+        },
+    );
 
     function addItem(): void {
         post(toUrl(storeItem({ cashflow: cashflowId })), {
@@ -224,13 +233,14 @@ function ExpenseSection({
     items: CashflowItem[];
     onEdit: (item: CashflowItem) => void;
 }) {
-    const { data, setData, errors, processing, post, reset } =
-        useForm<AddForm>({
+    const { data, setData, errors, processing, post, reset } = useForm<AddForm>(
+        {
             type: 'expense',
             name: '',
             amount: '',
             quantity: '1',
-        });
+        },
+    );
 
     function addItem(): void {
         post(toUrl(storeItem({ cashflow: cashflowId })), {
@@ -338,12 +348,7 @@ function ExpenseSection({
                     </Button>
                 </div>
 
-                <ItemList
-                    items={items}
-                    onEdit={onEdit}
-                    sign="−"
-                    showQuantity
-                />
+                <ItemList items={items} onEdit={onEdit} sign="−" showQuantity />
             </CardContent>
         </Card>
     );
@@ -384,8 +389,7 @@ function ItemList({
                     <div className="min-w-0 flex-1">
                         <p className="font-semibold">{item.name}</p>
                         <p className="text-xs text-muted-foreground">
-                            {showQuantity &&
-                                `${item.quantity} × `}
+                            {showQuantity && `${item.quantity} × `}
                             {sign}
                             {formatMoney(item.amount)}
                             {showQuantity &&
@@ -488,10 +492,7 @@ function EditItemDialog({
                                     inputMode="numeric"
                                     value={data.quantity}
                                     onChange={(event) =>
-                                        setData(
-                                            'quantity',
-                                            event.target.value,
-                                        )
+                                        setData('quantity', event.target.value)
                                     }
                                 />
                                 {errors.quantity && (
