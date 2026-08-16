@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 const APP_NAME = import.meta.env.VITE_APP_NAME || 'Life Man';
 const MIN_DURATION_MS = 1600;
 const FADE_DURATION_MS = 400;
+const FONT_TIMEOUT_MS = 3000;
 
 export function AppSplash() {
     const page = usePage();
@@ -14,9 +15,15 @@ export function AppSplash() {
 
     useEffect(() => {
         let fadeTimer: number | undefined;
+        let fontTimer: number | undefined;
 
         Promise.all([
-            document.fonts?.ready ?? Promise.resolve(),
+            Promise.race([
+                document.fonts?.ready ?? Promise.resolve(),
+                new Promise((resolve) => {
+                    fontTimer = window.setTimeout(resolve, FONT_TIMEOUT_MS);
+                }),
+            ]),
             new Promise((resolve) => setTimeout(resolve, MIN_DURATION_MS)),
         ]).then(() => {
             setFading(true);
@@ -28,6 +35,7 @@ export function AppSplash() {
 
         return () => {
             window.clearTimeout(fadeTimer);
+            window.clearTimeout(fontTimer);
         };
     }, []);
 
