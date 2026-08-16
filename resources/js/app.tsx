@@ -1,5 +1,4 @@
 import { createInertiaApp } from '@inertiajs/react';
-import { AppSplash } from '@/components/app-splash';
 import { LoadingOverlay } from '@/components/loading-overlay';
 import { Toaster } from '@/components/ui/sonner';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -47,7 +46,6 @@ createInertiaApp({
                     {app}
                     <Toaster />
                     <LoadingOverlay />
-                    <AppSplash />
                     <BackButtonHandler />
                     <FreshDataHandler />
                 </TooltipProvider>
