@@ -1,9 +1,13 @@
 import { Link, usePage } from '@inertiajs/react';
-import { Bell, ChevronRight, Lock, Palette, User } from 'lucide-react';
+import { Bell, ChevronRight, Info, Lock, Palette, User } from 'lucide-react';
 import type { PropsWithChildren } from 'react';
+import { useEffect, useState } from 'react';
 import Heading from '@/components/heading';
 import { useCurrentUrl } from '@/hooks/use-current-url';
+import { checkForUpdates } from '@/lib/update-check';
+import type { UpdateInfo } from '@/lib/update-check';
 import { cn, toUrl } from '@/lib/utils';
+import { edit as editAbout } from '@/routes/about';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editNotifications } from '@/routes/notifications';
 import { edit } from '@/routes/profile';
@@ -31,11 +35,31 @@ const sidebarNavItems: NavItem[] = [
         href: editNotifications(),
         icon: Bell,
     },
+    {
+        title: 'Versi App',
+        href: editAbout(),
+        icon: Info,
+    },
 ];
 
 export default function SettingsLayout({ children }: PropsWithChildren) {
     const { isCurrentOrParentUrl } = useCurrentUrl();
     const { appVersion } = usePage().props;
+    const [update, setUpdate] = useState<UpdateInfo | null>(null);
+
+    useEffect(() => {
+        let cancelled = false;
+
+        checkForUpdates(appVersion).then((info) => {
+            if (!cancelled) {
+                setUpdate(info);
+            }
+        });
+
+        return () => {
+            cancelled = true;
+        };
+    }, [appVersion]);
 
     return (
         <div className="px-4 py-6">
@@ -79,6 +103,13 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                     <span className="flex-1 text-sm font-medium">
                                         {item.title}
                                     </span>
+                                    {item.title === 'Versi App' &&
+                                        update?.updateAvailable && (
+                                            <span
+                                                className="size-2 shrink-0 rounded-full bg-destructive"
+                                                aria-label="Update tersedia"
+                                            />
+                                        )}
                                     <ChevronRight
                                         className={cn(
                                             'size-4 transition-all duration-200',
