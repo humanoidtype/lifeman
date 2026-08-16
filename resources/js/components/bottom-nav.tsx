@@ -13,7 +13,7 @@ const items = [
     { title: 'Ingetin', icon: AlarmClock, href: remindersIndex() },
     { title: 'Kas', icon: Wallet, href: cashflowsIndex() },
     { title: 'Nabung', icon: PiggyBank, href: savingsIndex() },
-    { title: 'Profil', icon: User, href: profile.edit() },
+    { title: 'Pengaturan', icon: User, href: profile.edit() },
 ];
 
 const baseUrl = 'http://life-man.test';

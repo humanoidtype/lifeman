@@ -74,7 +74,7 @@ export default function CashflowsIndex({ cashflows, filters }: Props) {
                     <>
                         {cashflows.data.length === 0 && (
                             <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
-                                Tidak ada catatan kas yang cocok.
+                                Belum ada catatan kas.
                             </p>
                         )}
 

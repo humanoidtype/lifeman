@@ -50,7 +50,7 @@ export default function SavingsIndex({ goals, filters }: Props) {
                 <div className="flex items-center justify-between gap-3">
                     <div>
                         <h1 className="text-2xl font-bold tracking-tight">
-                            Ingatkan Nabung
+                            Ayo Nabung
                         </h1>
                         <p className="text-sm text-muted-foreground">
                             Target tabunganmu, pantau progress setiap cicilan.
@@ -83,7 +83,7 @@ export default function SavingsIndex({ goals, filters }: Props) {
                     <>
                         {goals.data.length === 0 && (
                             <p className="col-span-full py-10 text-center text-sm text-muted-foreground">
-                                Tidak ada target nabung yang cocok.
+                                Belum ada target nabung yang dibuat.
                             </p>
                         )}
 

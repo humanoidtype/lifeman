@@ -16,12 +16,12 @@ import type { NavItem } from '@/types';
 
 const sidebarNavItems: NavItem[] = [
     {
-        title: 'Pengaturan',
+        title: 'Informasi Akun',
         href: edit(),
         icon: User,
     },
     {
-        title: 'Keamanan',
+        title: 'Kata Sandi',
         href: editSecurity(),
         icon: Lock,
     },
@@ -36,7 +36,7 @@ const sidebarNavItems: NavItem[] = [
         icon: Bell,
     },
     {
-        title: 'Versi App',
+        title: 'Tentang App',
         href: editAbout(),
         icon: Info,
     },
@@ -94,7 +94,7 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                                         <item.icon className="size-5" />
                                     )}
                                     <span>{item.title}</span>
-                                    {item.title === 'Versi App' &&
+                                    {item.title === 'Tentang App' &&
                                         update?.updateAvailable && (
                                             <span
                                                 className="absolute top-1.5 right-1.5 size-2 rounded-full bg-destructive"
@@ -105,10 +105,6 @@ export default function SettingsLayout({ children }: PropsWithChildren) {
                             );
                         })}
                     </nav>
-
-                    <p className="mt-4 text-center text-xs text-muted-foreground">
-                        Life Man v{appVersion}
-                    </p>
                 </aside>
 
                 <div className="flex-1 md:max-w-2xl">

@@ -101,7 +101,7 @@ export default function RemindersIndex({ reminders, filters }: Props) {
                     <>
                         {reminders.data.length === 0 && (
                             <p className="py-10 text-center text-sm text-muted-foreground">
-                                Tidak ada ingetin yang cocok.
+                                Belum ada pengingat.
                             </p>
                         )}
 
