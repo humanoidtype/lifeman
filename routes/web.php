@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\BusinessController;
+use App\Http\Controllers\BusinessTransactionController;
 use App\Http\Controllers\CashflowController;
 use App\Http\Controllers\CashflowItemController;
 use App\Http\Controllers\ReminderController;
@@ -187,6 +189,13 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('cashflows/{cashflow}/items', [CashflowItemController::class, 'store'])->name('cashflow-items.store');
     Route::patch('cashflow-items/{cashflow_item}', [CashflowItemController::class, 'update'])->name('cashflow-items.update');
     Route::delete('cashflow-items/{cashflow_item}', [CashflowItemController::class, 'destroy'])->name('cashflow-items.destroy');
+
+    Route::get('personal', fn () => Inertia::render('personal/index'))->name('personal.index');
+
+    Route::resource('businesses', BusinessController::class)->except(['edit']);
+    Route::post('businesses/{business}/transactions', [BusinessTransactionController::class, 'store'])->name('business-transactions.store');
+    Route::patch('business-transactions/{business_transaction}', [BusinessTransactionController::class, 'update'])->name('business-transactions.update');
+    Route::delete('business-transactions/{business_transaction}', [BusinessTransactionController::class, 'destroy'])->name('business-transactions.destroy');
 });
 
 require __DIR__.'/settings.php';

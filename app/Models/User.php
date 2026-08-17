@@ -68,4 +68,12 @@ class User extends Authenticatable
     {
         return $this->hasMany(Cashflow::class);
     }
+
+    /**
+     * @return HasMany<Business, $this>
+     */
+    public function businesses(): HasMany
+    {
+        return $this->hasMany(Business::class);
+    }
 }
