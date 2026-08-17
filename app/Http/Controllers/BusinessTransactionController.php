@@ -44,11 +44,15 @@ class BusinessTransactionController extends Controller
             'amount' => $request->float('amount'),
         ]);
 
-        return back();
+        return back()->with('success', 'Transaksi berhasil dicatat.');
     }
 
     public function update(UpdateBusinessTransactionRequest $request, BusinessTransaction $businessTransaction): RedirectResponse
     {
+        if ($businessTransaction->type === BusinessTransaction::TYPE_OPENING_BALANCE) {
+            return back()->with('error', 'Saldo awal kas tidak bisa diubah.');
+        }
+
         $data = [];
 
         if ($request->filled('name')) {
@@ -69,7 +73,7 @@ class BusinessTransactionController extends Controller
 
         $businessTransaction->update($data);
 
-        return back();
+        return back()->with('success', 'Transaksi berhasil diperbarui.');
     }
 
     public function destroy(BusinessTransaction $businessTransaction): RedirectResponse
@@ -78,6 +82,6 @@ class BusinessTransactionController extends Controller
 
         $businessTransaction->delete();
 
-        return back();
+        return back()->with('success', 'Transaksi dihapus.');
     }
 }

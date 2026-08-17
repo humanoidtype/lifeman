@@ -194,6 +194,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::resource('businesses', BusinessController::class)->except(['edit']);
     Route::post('businesses/{business}/transactions', [BusinessTransactionController::class, 'store'])->name('business-transactions.store');
+    Route::post('businesses/{business}/close', [BusinessController::class, 'close'])->name('businesses.close');
     Route::patch('business-transactions/{business_transaction}', [BusinessTransactionController::class, 'update'])->name('business-transactions.update');
     Route::delete('business-transactions/{business_transaction}', [BusinessTransactionController::class, 'destroy'])->name('business-transactions.destroy');
 });

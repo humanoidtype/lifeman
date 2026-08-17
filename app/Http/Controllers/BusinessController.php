@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreBusinessRequest;
 use App\Models\Business;
+use App\Models\BusinessTransaction;
 use App\Services\BusinessPeriodService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -52,7 +53,7 @@ class BusinessController extends Controller
             'profit_pct' => $percentages['profit'],
         ]);
 
-        return redirect()->route('businesses.show', $business);
+        return redirect()->route('businesses.show', $business)->with('success', 'Manajemen bisnis berhasil dibuat.');
     }
 
     public function show(Business $business, BusinessPeriodService $periods): Response
@@ -88,7 +89,41 @@ class BusinessController extends Controller
             ],
             'lr' => $periods->lr($business, $current),
             'lr_chart' => $periods->lrChart($business),
+            'kas_opened_at' => $periods->kasOpenedAt($business),
         ]);
+    }
+
+    public function close(Business $business, Request $request, BusinessPeriodService $periods): RedirectResponse
+    {
+        $this->authorize('close', $business);
+
+        $today = now()->startOfDay();
+
+        $alreadyClosed = $business->transactions()
+            ->where('type', BusinessTransaction::TYPE_OPENING_BALANCE)
+            ->whereDate('date', $today)
+            ->exists();
+
+        if ($alreadyClosed) {
+            return back()->with('error', 'Kas sudah ditutup hari ini.');
+        }
+
+        $closingBalance = $periods->closingBalance($business, $today);
+
+        $hasTransactions = $business->transactions()->exists();
+
+        if (! $hasTransactions) {
+            return back()->with('error', 'Belum ada transaksi untuk ditutup.');
+        }
+
+        $business->transactions()->create([
+            'date' => $today,
+            'type' => BusinessTransaction::TYPE_OPENING_BALANCE,
+            'name' => 'Saldo awal kas',
+            'amount' => $closingBalance,
+        ]);
+
+        return back()->with('success', 'Kas ditutup. Kas baru dibuka dengan saldo awal '.number_format($closingBalance, 0, ',', '.').'.');
     }
 
     public function destroy(Business $business): RedirectResponse
@@ -97,6 +132,6 @@ class BusinessController extends Controller
 
         $business->delete();
 
-        return redirect()->route('businesses.index');
+        return redirect()->route('businesses.index')->with('success', 'Manajemen bisnis dihapus.');
     }
 }

@@ -36,6 +36,8 @@ class BusinessTransaction extends Model
 
     public const TYPE_EXPENSE_BIG = 'expense_big';
 
+    public const TYPE_OPENING_BALANCE = 'opening_balance';
+
     public const CATEGORY_RAW_MATERIAL = 'raw_material';
 
     public const CATEGORY_OPERATIONAL = 'operational';
@@ -43,6 +45,18 @@ class BusinessTransaction extends Model
     public const CATEGORY_MARKETING = 'marketing';
 
     public const TYPES = [
+        self::TYPE_INITIAL_CAPITAL,
+        self::TYPE_DAILY_MODAL,
+        self::TYPE_INCOME,
+        self::TYPE_EXPENSE_SMALL,
+        self::TYPE_EXPENSE_BIG,
+        self::TYPE_OPENING_BALANCE,
+    ];
+
+    /**
+     * Types that can be created through the transaction form.
+     */
+    public const FORM_TYPES = [
         self::TYPE_INITIAL_CAPITAL,
         self::TYPE_DAILY_MODAL,
         self::TYPE_INCOME,

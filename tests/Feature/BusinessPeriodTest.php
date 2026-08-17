@@ -226,3 +226,47 @@ test('lr chart contains one entry per period', function () {
     expect($chart)->toHaveCount(3);
     expect($chart[0])->toHaveKeys(['key', 'start', 'end', 'profit', 'target_profit', 'income']);
 });
+
+test('ledger treats opening balance as a net-zero continuity marker', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create();
+
+    $business->transactions()->create([
+        'date' => '2026-08-17',
+        'type' => BusinessTransaction::TYPE_INITIAL_CAPITAL,
+        'name' => 'Modal awal',
+        'amount' => 1000000,
+    ]);
+    $business->transactions()->create([
+        'date' => '2026-08-18',
+        'type' => BusinessTransaction::TYPE_INCOME,
+        'name' => 'Pendapatan',
+        'amount' => 200000,
+    ]);
+    $business->transactions()->create([
+        'date' => '2026-08-18',
+        'type' => BusinessTransaction::TYPE_OPENING_BALANCE,
+        'name' => 'Saldo awal kas',
+        'amount' => 1200000,
+    ]);
+    $business->transactions()->create([
+        'date' => '2026-08-18',
+        'type' => BusinessTransaction::TYPE_EXPENSE_SMALL,
+        'name' => 'Bahan',
+        'category' => BusinessTransaction::CATEGORY_RAW_MATERIAL,
+        'amount' => 100000,
+    ]);
+
+    $ledger = $this->service->ledger($business);
+    $opening = collect($ledger['rows'])->firstWhere('type', BusinessTransaction::TYPE_OPENING_BALANCE);
+    $last = collect($ledger['rows'])->last();
+
+    expect($opening['income'])->toBe(1200000.0);
+    expect($opening['balance'])->toBe(1200000.0);
+    expect($last['balance'])->toBe(1100000.0);
+
+    $day = collect($ledger['days'])->firstWhere('date', '2026-08-18');
+    expect($day['income'])->toBe(200000.0);
+    expect($day['expense'])->toBe(100000.0);
+    expect($day['balance'])->toBe(1100000.0);
+});

@@ -39,4 +39,9 @@ class BusinessPolicy
     {
         return $user->id === $business->user_id;
     }
+
+    public function close(User $user, Business $business): bool
+    {
+        return $user->id === $business->user_id;
+    }
 }

@@ -113,6 +113,9 @@ class BusinessPeriodService
             } elseif ($transaction->type === BusinessTransaction::TYPE_DAILY_MODAL) {
                 $income = $amount;
                 $expense = $amount;
+            } elseif ($transaction->type === BusinessTransaction::TYPE_OPENING_BALANCE) {
+                $income = $amount;
+                $expense = 0.0;
             } elseif ($isExpense) {
                 $income = 0.0;
                 $expense = $amount;
@@ -121,12 +124,17 @@ class BusinessPeriodService
                 $expense = 0.0;
             }
 
-            $balance += $income - $expense;
+            if ($transaction->type === BusinessTransaction::TYPE_OPENING_BALANCE) {
+                // Continuity marker between kas sessions: shown as "masuk"
+                // but net-zero on the running balance and day totals.
+            } else {
+                $balance += $income - $expense;
 
-            $dayTotals[$dateKey] ??= ['income' => 0.0, 'expense' => 0.0, 'balance' => 0.0];
-            $dayTotals[$dateKey]['income'] += $income;
-            $dayTotals[$dateKey]['expense'] += $expense;
-            $dayTotals[$dateKey]['balance'] = $balance;
+                $dayTotals[$dateKey] ??= ['income' => 0.0, 'expense' => 0.0, 'balance' => 0.0];
+                $dayTotals[$dateKey]['income'] += $income;
+                $dayTotals[$dateKey]['expense'] += $expense;
+                $dayTotals[$dateKey]['balance'] = $balance;
+            }
 
             $rows[] = [
                 'id' => $transaction->id,
@@ -176,6 +184,40 @@ class BusinessPeriodService
         }
 
         return $result;
+    }
+
+    /**
+     * The current closing balance of the kas (all rows up to today).
+     */
+    public function closingBalance(Business $business, CarbonInterface $today): float
+    {
+        $balance = 0.0;
+
+        foreach ($this->ledger($business)['rows'] as $row) {
+            if ($row['date'] > $today->format('Y-m-d')) {
+                break;
+            }
+
+            $balance = $row['balance'];
+        }
+
+        return $balance;
+    }
+
+    /**
+     * The date the current kas session was opened (last opening balance or initial capital).
+     */
+    public function kasOpenedAt(Business $business): ?string
+    {
+        $transactions = $business->transactions()
+            ->whereIn('type', [
+                BusinessTransaction::TYPE_OPENING_BALANCE,
+                BusinessTransaction::TYPE_INITIAL_CAPITAL,
+            ])
+            ->orderByDesc('date')
+            ->first();
+
+        return $transactions?->date->format('Y-m-d');
     }
 
     /**

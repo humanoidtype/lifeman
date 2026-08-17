@@ -98,7 +98,8 @@ export type BusinessTransaction = {
         | 'daily_modal'
         | 'income'
         | 'expense_small'
-        | 'expense_big';
+        | 'expense_big'
+        | 'opening_balance';
     name: string;
     category: 'raw_material' | 'operational' | 'marketing' | null;
     amount: string;

@@ -26,6 +26,10 @@ class UpdateBusinessTransactionRequest extends FormRequest
             return [];
         }
 
+        if ($transaction->type === BusinessTransaction::TYPE_OPENING_BALANCE) {
+            return [];
+        }
+
         $isExpense = $transaction->type === BusinessTransaction::TYPE_EXPENSE_SMALL
             || $transaction->type === BusinessTransaction::TYPE_EXPENSE_BIG;
 

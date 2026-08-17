@@ -13,6 +13,8 @@ import {
     ArrowLeft,
     Banknote,
     Check,
+    Loader2,
+    Lock,
     Pencil,
     Plus,
     Trash2,
@@ -21,6 +23,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -45,7 +48,7 @@ import {
     store as storeTransaction,
     update as updateTransaction,
 } from '@/routes/business-transactions';
-import { index } from '@/routes/businesses';
+import { close as closeBusiness, index } from '@/routes/businesses';
 import type {
     Business,
     BusinessFormula,
@@ -71,6 +74,7 @@ const typeLabels: Record<LedgerRow['type'], string> = {
     income: 'Pendapatan',
     expense_small: 'Pengeluaran kecil',
     expense_big: 'Pengeluaran besar',
+    opening_balance: 'Saldo awal kas',
 };
 
 const categoryLabels: Record<string, string> = {
@@ -105,7 +109,13 @@ type Props = {
     current_period: { start: string; end: string };
     lr: LrSummary;
     lr_chart: LrChartPoint[];
+    kas_opened_at: string | null;
 };
+
+const reloadProps = {
+    only: ['ledger', 'days', 'lr', 'lr_chart', 'kas_opened_at'],
+    preserveScroll: true,
+} satisfies { only: string[]; preserveScroll: boolean };
 
 type AmountForm = {
     type: string;
@@ -146,10 +156,15 @@ export default function BusinessesShow({
     current_period,
     lr,
     lr_chart,
+    kas_opened_at,
 }: Props) {
     const today = new Date().toISOString().slice(0, 10);
     const [filterDate, setFilterDate] = useState<string | null>(null);
     const [editingCapital, setEditingCapital] = useState(false);
+    const [pendingDelete, setPendingDelete] = useState<LedgerRow | null>(null);
+    const [deleting, setDeleting] = useState(false);
+    const [closeOpen, setCloseOpen] = useState(false);
+    const [closing, setClosing] = useState(false);
 
     const initialCapital = ledger.rows.find(
         (row) => row.type === 'initial_capital',
@@ -190,20 +205,41 @@ export default function BusinessesShow({
 
     const lastBalance = rows.length > 0 ? rows[rows.length - 1].balance : 0;
 
-    function removeTransaction(row: LedgerRow): void {
-        if (
-            window.confirm(
-                `Hapus "${row.name}" ${formatMoney(Math.max(row.income, row.expense))}?`,
-            )
-        ) {
-            router.delete(
-                toUrl(
-                    destroyTransaction({
-                        business_transaction: row.id,
-                    }),
-                ),
-            );
+    function confirmDelete(): void {
+        if (!pendingDelete) {
+            return;
         }
+
+        router.delete(
+            toUrl(
+                destroyTransaction({
+                    business_transaction: pendingDelete.id,
+                }),
+            ),
+            {
+                ...reloadProps,
+                onStart: () => setDeleting(true),
+                onFinish: () => {
+                    setDeleting(false);
+                    setPendingDelete(null);
+                },
+            },
+        );
+    }
+
+    function closeKas(): void {
+        router.post(
+            toUrl(closeBusiness({ business: business.id })),
+            undefined,
+            {
+                ...reloadProps,
+                onStart: () => setClosing(true),
+                onFinish: () => {
+                    setClosing(false);
+                    setCloseOpen(false);
+                },
+            },
+        );
     }
 
     return (
@@ -379,15 +415,31 @@ export default function BusinessesShow({
                                             </div>
                                             <div className="divide-y divide-border/60">
                                                 {groupRows.map((row) => (
-                                                    <LedgerItem
-                                                        key={row.id}
-                                                        row={row}
-                                                        onDelete={() =>
-                                                            removeTransaction(
-                                                                row,
-                                                            )
-                                                        }
-                                                    />
+                                                    <div key={row.id}>
+                                                        {row.type ===
+                                                            'opening_balance' && (
+                                                            <div className="flex items-center gap-2 py-2">
+                                                                <div className="h-px flex-1 border-t border-dashed" />
+                                                                <span className="text-[11px] font-medium text-muted-foreground">
+                                                                    Kas baru
+                                                                    dibuka ·
+                                                                    saldo awal{' '}
+                                                                    {formatMoney(
+                                                                        row.income,
+                                                                    )}
+                                                                </span>
+                                                                <div className="h-px flex-1 border-t border-dashed" />
+                                                            </div>
+                                                        )}
+                                                        <LedgerItem
+                                                            row={row}
+                                                            onDelete={() =>
+                                                                setPendingDelete(
+                                                                    row,
+                                                                )
+                                                            }
+                                                        />
+                                                    </div>
                                                 ))}
                                             </div>
                                         </div>
@@ -395,6 +447,35 @@ export default function BusinessesShow({
                                 })}
                             </div>
                         )}
+
+                        <div className="flex flex-wrap items-center justify-between gap-3 border-t pt-3">
+                            <div>
+                                <p className="text-xs text-muted-foreground">
+                                    Saldo akhir kas
+                                </p>
+                                <p
+                                    className={cn(
+                                        'text-2xl font-bold',
+                                        lastBalance < 0 && 'text-destructive',
+                                    )}
+                                >
+                                    {formatMoney(lastBalance)}
+                                </p>
+                                {kas_opened_at && (
+                                    <p className="text-xs text-muted-foreground">
+                                        Kas dibuka {formatDate(kas_opened_at)}
+                                    </p>
+                                )}
+                            </div>
+                            <Button
+                                variant="outline"
+                                onClick={() => setCloseOpen(true)}
+                                disabled={rows.length === 0}
+                            >
+                                <Lock className="size-4" />
+                                Tutup Transaksi
+                            </Button>
+                        </div>
                     </CardContent>
                 </Card>
 
@@ -468,6 +549,30 @@ export default function BusinessesShow({
                     lrChart={lr_chart}
                 />
             </div>
+
+            <ConfirmDialog
+                open={pendingDelete !== null}
+                onOpenChange={(open) => !open && setPendingDelete(null)}
+                title="Hapus transaksi"
+                description={
+                    pendingDelete
+                        ? `Hapus "${pendingDelete.name}" ${formatMoney(Math.max(pendingDelete.income, pendingDelete.expense))}?`
+                        : undefined
+                }
+                processing={deleting}
+                onConfirm={confirmDelete}
+            />
+
+            <ConfirmDialog
+                open={closeOpen}
+                onOpenChange={setCloseOpen}
+                title="Tutup Transaksi"
+                description={`Kas akan ditutup dan kas baru dibuka dengan saldo awal ${formatMoney(lastBalance)}. Data kas sebelumnya tetap tersimpan.`}
+                confirmLabel="Tutup Kas"
+                destructive={false}
+                processing={closing}
+                onConfirm={closeKas}
+            />
         </>
     );
 }
@@ -502,6 +607,7 @@ function InitialCapitalCard({
             date: new Date().toISOString().slice(0, 10),
         });
         createForm.post(toUrl(storeTransaction({ business: business.id })), {
+            ...reloadProps,
             onSuccess: () => {
                 createForm.reset();
                 setEditing(false);
@@ -517,6 +623,7 @@ function InitialCapitalCard({
         editForm.patch(
             toUrl(updateTransaction({ business_transaction: capital.id })),
             {
+                ...reloadProps,
                 onSuccess: () => setEditing(false),
             },
         );
@@ -564,6 +671,9 @@ function InitialCapitalCard({
                             createForm.processing || !createForm.data.amount
                         }
                     >
+                        {createForm.processing && (
+                            <Loader2 className="size-4 animate-spin" />
+                        )}
                         Simpan
                     </Button>
                     {createForm.errors.amount && (
@@ -590,6 +700,9 @@ function InitialCapitalCard({
                         }
                     />
                     <Button onClick={submitEdit} disabled={editForm.processing}>
+                        {editForm.processing && (
+                            <Loader2 className="size-4 animate-spin" />
+                        )}
                         Ubah
                     </Button>
                 </CardContent>
@@ -614,6 +727,7 @@ function DailyModalRow({ business }: { business: Props['business'] }) {
             amount: form.data.amount,
         });
         form.post(toUrl(storeTransaction({ business: business.id })), {
+            ...reloadProps,
             onSuccess: () => form.reset(),
         });
     }
@@ -650,6 +764,7 @@ function DailyModalRow({ business }: { business: Props['business'] }) {
                 onClick={submit}
                 disabled={form.processing || !form.data.amount}
             >
+                {form.processing && <Loader2 className="size-4 animate-spin" />}
                 Catat
             </Button>
             {(form.errors.amount || form.errors.daily_modal) && (
@@ -672,6 +787,7 @@ function IncomeRow({ business }: { business: Props['business'] }) {
     function submit(): void {
         form.setData({ ...form.data, type: 'income' });
         form.post(toUrl(storeTransaction({ business: business.id })), {
+            ...reloadProps,
             onSuccess: () => form.reset(),
         });
     }
@@ -718,6 +834,7 @@ function IncomeRow({ business }: { business: Props['business'] }) {
                     form.processing || !form.data.name || !form.data.amount
                 }
             >
+                {form.processing && <Loader2 className="size-4 animate-spin" />}
                 Catat
             </Button>
             {(form.errors.name || form.errors.amount) && (
@@ -741,6 +858,7 @@ function SmallExpenseRow({ business }: { business: Props['business'] }) {
     function submit(): void {
         form.setData({ ...form.data, type: 'expense_small' });
         form.post(toUrl(storeTransaction({ business: business.id })), {
+            ...reloadProps,
             onSuccess: () => form.reset(),
         });
     }
@@ -807,6 +925,7 @@ function SmallExpenseRow({ business }: { business: Props['business'] }) {
                     !form.data.category
                 }
             >
+                {form.processing && <Loader2 className="size-4 animate-spin" />}
                 Catat
             </Button>
             {(form.errors.name ||
@@ -834,6 +953,7 @@ function BigExpenseRow({ business }: { business: Props['business'] }) {
     function submit(): void {
         form.setData({ ...form.data, type: 'expense_big' });
         form.post(toUrl(storeTransaction({ business: business.id })), {
+            ...reloadProps,
             onSuccess: () => form.reset(),
         });
     }
@@ -884,7 +1004,11 @@ function BigExpenseRow({ business }: { business: Props['business'] }) {
                     !form.data.category
                 }
             >
-                <Plus className="size-4" />
+                {form.processing ? (
+                    <Loader2 className="size-4 animate-spin" />
+                ) : (
+                    <Plus className="size-4" />
+                )}
                 Catat
             </Button>
             {(form.errors.name ||
@@ -910,20 +1034,22 @@ function LedgerItem({
     const isBig = row.type === 'expense_big';
     const isCapital = row.type === 'initial_capital';
     const isDailyModal = row.type === 'daily_modal';
+    const isOpening = row.type === 'opening_balance';
 
     return (
         <div
             className={cn(
                 'flex items-center gap-2 py-2',
-                isBig && 'font-semibold',
-                isCapital && 'font-semibold',
+                (isBig || isCapital || isOpening) && 'font-semibold',
             )}
         >
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1.5">
                     <p className="truncate text-sm">{row.name}</p>
                     <Badge
-                        variant={isCapital ? 'default' : 'secondary'}
+                        variant={
+                            isCapital || isOpening ? 'default' : 'secondary'
+                        }
                         className="text-[10px]"
                     >
                         {typeLabels[row.type]}
@@ -947,6 +1073,11 @@ function LedgerItem({
                 {isDailyModal && (
                     <p className="text-[11px] text-muted-foreground">
                         netto 0 (keluar masuk kas)
+                    </p>
+                )}
+                {isOpening && (
+                    <p className="text-[11px] text-muted-foreground">
+                        saldo mengalir dari kas sebelumnya
                     </p>
                 )}
             </div>

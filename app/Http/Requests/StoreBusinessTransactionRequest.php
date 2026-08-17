@@ -22,7 +22,7 @@ class StoreBusinessTransactionRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'in:'.implode(',', BusinessTransaction::TYPES)],
+            'type' => ['required', 'in:'.implode(',', BusinessTransaction::FORM_TYPES)],
             'date' => ['required', 'date'],
             'name' => ['required', 'string', 'max:100'],
             'category' => [

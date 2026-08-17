@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Business;
+use App\Models\BusinessTransaction;
 use App\Models\User;
 
 test('guests are redirected to the login page', function () {
@@ -158,4 +159,76 @@ test('show page renders ledger and lr data', function () {
             ->has('periods')
             ->has('lr')
             ->has('lr_chart'));
+});
+
+test('closing the kas creates an opening balance row', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create();
+
+    $business->transactions()->create([
+        'date' => now()->toDateString(),
+        'type' => BusinessTransaction::TYPE_INITIAL_CAPITAL,
+        'name' => 'Modal awal',
+        'amount' => 1000000,
+    ]);
+    $business->transactions()->create([
+        'date' => now()->toDateString(),
+        'type' => BusinessTransaction::TYPE_INCOME,
+        'name' => 'Pendapatan',
+        'amount' => 200000,
+    ]);
+    $business->transactions()->create([
+        'date' => now()->toDateString(),
+        'type' => BusinessTransaction::TYPE_EXPENSE_SMALL,
+        'name' => 'Bahan',
+        'category' => BusinessTransaction::CATEGORY_RAW_MATERIAL,
+        'amount' => 70000,
+    ]);
+
+    $this->actingAs($user)
+        ->post(route('businesses.close', $business))
+        ->assertRedirect()
+        ->assertSessionHas('success');
+
+    $opening = $business->transactions()
+        ->where('type', BusinessTransaction::TYPE_OPENING_BALANCE)
+        ->first();
+
+    expect($opening)->not->toBeNull();
+    expect($opening->date->toDateString())->toBe(now()->toDateString());
+    expect($opening->name)->toBe('Saldo awal kas');
+    expect((float) $opening->amount)->toBe(1130000.0);
+});
+
+test('closing the kas twice on the same day is rejected', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create();
+
+    $business->transactions()->create([
+        'date' => now()->toDateString(),
+        'type' => BusinessTransaction::TYPE_INITIAL_CAPITAL,
+        'name' => 'Modal awal',
+        'amount' => 1000000,
+    ]);
+
+    $this->actingAs($user)->post(route('businesses.close', $business))->assertSessionHas('success');
+
+    $this->actingAs($user)
+        ->post(route('businesses.close', $business))
+        ->assertSessionHas('error');
+
+    $count = $business->transactions()
+        ->where('type', BusinessTransaction::TYPE_OPENING_BALANCE)
+        ->count();
+
+    expect($count)->toBe(1);
+});
+
+test('closing the kas without transactions is rejected', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create();
+
+    $this->actingAs($user)
+        ->post(route('businesses.close', $business))
+        ->assertSessionHas('error');
 });
