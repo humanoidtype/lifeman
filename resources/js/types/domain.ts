@@ -72,3 +72,76 @@ export type PaginatedData<T> = {
     from: number;
     to: number;
 };
+
+export type Business = {
+    id: number;
+    name: string;
+    rekap_period: 'weekly' | 'monthly' | 'yearly';
+    period_start: string;
+    transactions_count?: number;
+    formula_type?: string;
+    formula?: BusinessFormula;
+};
+
+export type BusinessFormula = {
+    raw_material: number;
+    operational: number;
+    marketing: number;
+    profit: number;
+};
+
+export type BusinessTransaction = {
+    id: number;
+    date: string;
+    type:
+        | 'initial_capital'
+        | 'daily_modal'
+        | 'income'
+        | 'expense_small'
+        | 'expense_big';
+    name: string;
+    category: 'raw_material' | 'operational' | 'marketing' | null;
+    amount: string;
+};
+
+export type LedgerRow = {
+    id: number;
+    date: string;
+    name: string;
+    type: BusinessTransaction['type'];
+    category: BusinessTransaction['category'];
+    income: number;
+    expense: number;
+    balance: number;
+};
+
+export type LedgerDay = {
+    date: string;
+    income: number;
+    expense: number;
+    balance: number;
+};
+
+export type LrSummary = {
+    start: string;
+    end: string;
+    income: number;
+    expenses: {
+        raw_material: number;
+        operational: number;
+        marketing: number;
+    };
+    total_expense: number;
+    profit: number;
+    formula: BusinessFormula;
+    analysis: string[];
+};
+
+export type LrChartPoint = {
+    key: string;
+    start: string;
+    end: string;
+    profit: number;
+    target_profit: number;
+    income: number;
+};

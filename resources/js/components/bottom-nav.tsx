@@ -1,19 +1,17 @@
 import { Link, router, usePage } from '@inertiajs/react';
-import { AlarmClock, Home, PiggyBank, User, Wallet } from 'lucide-react';
+import { Briefcase, Home, Settings, User } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { cn, toUrl } from '@/lib/utils';
 import { dashboard } from '@/routes';
-import { index as cashflowsIndex } from '@/routes/cashflows';
+import { index as businessesIndex } from '@/routes/businesses';
+import { index as personalIndex } from '@/routes/personal';
 import profile from '@/routes/profile';
-import { index as remindersIndex } from '@/routes/reminders';
-import { index as savingsIndex } from '@/routes/savings-goals';
 
 const items = [
     { title: 'Beranda', icon: Home, href: dashboard() },
-    { title: 'Ingetin', icon: AlarmClock, href: remindersIndex() },
-    { title: 'Kas', icon: Wallet, href: cashflowsIndex() },
-    { title: 'Nabung', icon: PiggyBank, href: savingsIndex() },
-    { title: 'Pengaturan', icon: User, href: profile.edit() },
+    { title: 'Pribadi', icon: User, href: personalIndex() },
+    { title: 'Bisnis', icon: Briefcase, href: businessesIndex() },
+    { title: 'Pengaturan', icon: Settings, href: profile.edit() },
 ];
 
 const baseUrl = 'http://life-man.test';
