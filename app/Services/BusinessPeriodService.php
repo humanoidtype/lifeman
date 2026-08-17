@@ -244,7 +244,7 @@ class BusinessPeriodService
             } elseif ($profit >= 0) {
                 $analysis[] = "Laba {$this->pct($profitPct)} di bawah target rumus {$this->pct($formula['profit'])} ({$this->pct($diffProfit)}) — tinjau kembali kategori yang melebihi rumus.";
             } else {
-                $analysis[] = "Periode ini mengalami rugi Rp " . number_format(abs($profit), 0, ',', '.') . " — segera evaluasi pendapatan dan pengeluaran.";
+                $analysis[] = 'Periode ini mengalami rugi Rp '.number_format(abs($profit), 0, ',', '.').' — segera evaluasi pendapatan dan pengeluaran.';
             }
         }
 
@@ -310,6 +310,6 @@ class BusinessPeriodService
 
     private function pct(float $value): string
     {
-        return number_format($value, 1) . '%';
+        return number_format($value, 1).'%';
     }
 }

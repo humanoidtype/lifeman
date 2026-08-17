@@ -4,6 +4,7 @@ namespace App\Http\Requests;
 
 use App\Models\Business;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Validator;
 
 class StoreBusinessRequest extends FormRequest
 {
@@ -19,9 +20,9 @@ class StoreBusinessRequest extends FormRequest
     {
         return [
             'name' => ['required', 'string', 'max:100'],
-            'rekap_period' => ['required', 'in:' . implode(',', [Business::PERIOD_WEEKLY, Business::PERIOD_MONTHLY, Business::PERIOD_YEARLY])],
+            'rekap_period' => ['required', 'in:'.implode(',', [Business::PERIOD_WEEKLY, Business::PERIOD_MONTHLY, Business::PERIOD_YEARLY])],
             'period_start' => ['required', 'date'],
-            'formula_type' => ['required', 'in:' . implode(',', [Business::FORMULA_FB_A, Business::FORMULA_FB_B, Business::FORMULA_CUSTOM])],
+            'formula_type' => ['required', 'in:'.implode(',', [Business::FORMULA_FB_A, Business::FORMULA_FB_B, Business::FORMULA_CUSTOM])],
             'raw_material_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'operational_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'marketing_pct' => ['nullable', 'numeric', 'min:0', 'max:100'],
@@ -42,9 +43,9 @@ class StoreBusinessRequest extends FormRequest
         ];
     }
 
-    protected function withValidator(\Illuminate\Validation\Validator $validator): void
+    protected function withValidator(Validator $validator): void
     {
-        $validator->after(function (\Illuminate\Validation\Validator $validator): void {
+        $validator->after(function (Validator $validator): void {
             if ($this->string('formula_type')->toString() !== Business::FORMULA_CUSTOM) {
                 return;
             }
@@ -55,7 +56,7 @@ class StoreBusinessRequest extends FormRequest
                 + $this->float('profit_pct');
 
             if (abs($sum - 100) > 0.01) {
-                $validator->errors()->add('profit_pct', 'Total persentase rumus harus 100% (sekarang ' . number_format($sum, 2) . '%).');
+                $validator->errors()->add('profit_pct', 'Total persentase rumus harus 100% (sekarang '.number_format($sum, 2).'%).');
             }
         });
     }

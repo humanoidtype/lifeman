@@ -30,7 +30,7 @@ class UpdateBusinessTransactionRequest extends FormRequest
                 $type === BusinessTransaction::TYPE_EXPENSE_SMALL || $type === BusinessTransaction::TYPE_EXPENSE_BIG
                     ? 'required'
                     : 'prohibited',
-                'in:' . implode(',', BusinessTransaction::CATEGORIES),
+                'in:'.implode(',', BusinessTransaction::CATEGORIES),
             ],
             'amount' => ['sometimes', 'numeric', 'min:0'],
         ];
