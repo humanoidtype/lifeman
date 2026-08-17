@@ -63,6 +63,8 @@ class StoreBusinessRequest extends FormRequest
 
     /**
      * Fill custom formula percentages, defaults to the preset when a preset is chosen.
+     *
+     * @return array{raw_material: float, operational: float, marketing: float, profit: float}
      */
     public function formulaPercentages(): array
     {

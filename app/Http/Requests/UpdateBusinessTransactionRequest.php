@@ -20,16 +20,21 @@ class UpdateBusinessTransactionRequest extends FormRequest
      */
     public function rules(): array
     {
-        $type = $this->route('business_transaction')?->type;
+        $transaction = $this->route('business_transaction');
+
+        if (! $transaction instanceof BusinessTransaction) {
+            return [];
+        }
+
+        $isExpense = $transaction->type === BusinessTransaction::TYPE_EXPENSE_SMALL
+            || $transaction->type === BusinessTransaction::TYPE_EXPENSE_BIG;
 
         return [
             'date' => ['sometimes', 'date'],
             'name' => ['sometimes', 'string', 'max:100'],
             'category' => [
                 'nullable',
-                $type === BusinessTransaction::TYPE_EXPENSE_SMALL || $type === BusinessTransaction::TYPE_EXPENSE_BIG
-                    ? 'required'
-                    : 'prohibited',
+                $isExpense ? 'required' : 'prohibited',
                 'in:'.implode(',', BusinessTransaction::CATEGORIES),
             ],
             'amount' => ['sometimes', 'numeric', 'min:0'],

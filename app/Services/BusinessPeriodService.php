@@ -11,7 +11,7 @@ class BusinessPeriodService
     /**
      * The bounds of the rekap period that contains the given date.
      *
-     * @return array{start: Carbon, end: Carbon}
+     * @return array{start: CarbonInterface, end: CarbonInterface}
      */
     public function periodBounds(Business $business, CarbonInterface $date): array
     {
@@ -37,7 +37,7 @@ class BusinessPeriodService
     /**
      * The bounds of the current (active) period.
      *
-     * @return array{start: Carbon, end: Carbon}
+     * @return array{start: CarbonInterface, end: CarbonInterface}
      */
     public function currentPeriod(Business $business): array
     {
@@ -47,7 +47,7 @@ class BusinessPeriodService
     /**
      * All periods from the business' start until today, newest first.
      *
-     * @return list<array{key: string, start: Carbon, end: Carbon, active: bool, completed: bool}>
+     * @return list<array{key: string, start: CarbonInterface, end: CarbonInterface, active: bool, completed: bool}>
      */
     public function periods(Business $business): array
     {
@@ -69,7 +69,7 @@ class BusinessPeriodService
                 'key' => $cursor->format('Y-m-d'),
                 'start' => $cursor->copy(),
                 'end' => $end,
-                'active' => $cursor->lte($today) && $end->gte($today),
+                'active' => $end->gte($today),
                 'completed' => $end->lt($today),
             ];
 
@@ -181,7 +181,7 @@ class BusinessPeriodService
     /**
      * The L/R calculation for a period compared against the business formula.
      *
-     * @param  array{start: Carbon, end: Carbon}  $period
+     * @param  array{start: CarbonInterface, end: CarbonInterface}  $period
      * @return array<string, mixed>
      */
     public function lr(Business $business, array $period): array
@@ -293,7 +293,7 @@ class BusinessPeriodService
     }
 
     /**
-     * @return array{start: Carbon, end: Carbon}
+     * @return array{start: CarbonInterface, end: CarbonInterface}
      */
     private function weeklyBounds(Business $business, CarbonInterface $day): array
     {
