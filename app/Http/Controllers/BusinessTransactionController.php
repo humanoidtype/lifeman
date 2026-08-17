@@ -7,6 +7,7 @@ use App\Http\Requests\UpdateBusinessTransactionRequest;
 use App\Models\Business;
 use App\Models\BusinessTransaction;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class BusinessTransactionController extends Controller
 {
@@ -34,15 +35,29 @@ class BusinessTransactionController extends Controller
             }
         }
 
-        $business->transactions()->create([
-            'date' => $date,
-            'type' => $type,
-            'name' => $request->string('name')->trim()->toString(),
-            'category' => $request->string('category')->isEmpty()
-                ? null
-                : $request->string('category')->toString(),
-            'amount' => $request->float('amount'),
-        ]);
+        $preOperationalAmount = $request->float('pre_operational_amount', 0);
+
+        DB::transaction(function () use ($business, $date, $type, $request, $preOperationalAmount) {
+            $business->transactions()->create([
+                'date' => $date,
+                'type' => $type,
+                'name' => $request->string('name')->trim()->toString(),
+                'category' => $request->string('category')->isEmpty()
+                    ? null
+                    : $request->string('category')->toString(),
+                'amount' => $request->float('amount'),
+            ]);
+
+            if ($type === BusinessTransaction::TYPE_INITIAL_CAPITAL && $preOperationalAmount > 0) {
+                $business->transactions()->create([
+                    'date' => $date,
+                    'type' => BusinessTransaction::TYPE_EXPENSE_BIG,
+                    'name' => 'Modal pra-operasional',
+                    'category' => BusinessTransaction::CATEGORY_PRE_OPERATIONAL,
+                    'amount' => $preOperationalAmount,
+                ]);
+            }
+        });
 
         return back()->with('success', 'Transaksi berhasil dicatat.');
     }

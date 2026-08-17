@@ -227,6 +227,50 @@ test('lr chart contains one entry per period', function () {
     expect($chart[0])->toHaveKeys(['key', 'start', 'end', 'profit', 'target_profit', 'income']);
 });
 
+test('ledger and lr include pre-operational spending', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create([
+        'formula_type' => Business::FORMULA_FB_A,
+        'period_start' => '2026-08-01',
+        'rekap_period' => Business::PERIOD_MONTHLY,
+    ]);
+
+    $business->transactions()->create([
+        'date' => '2026-08-17',
+        'type' => BusinessTransaction::TYPE_INITIAL_CAPITAL,
+        'name' => 'Modal awal',
+        'amount' => 5000000,
+    ]);
+    $business->transactions()->create([
+        'date' => '2026-08-17',
+        'type' => BusinessTransaction::TYPE_EXPENSE_BIG,
+        'name' => 'Modal pra-operasional',
+        'category' => BusinessTransaction::CATEGORY_PRE_OPERATIONAL,
+        'amount' => 700000,
+    ]);
+    $business->transactions()->create([
+        'date' => '2026-08-20',
+        'type' => BusinessTransaction::TYPE_INCOME,
+        'name' => 'Pendapatan',
+        'amount' => 2000000,
+    ]);
+
+    $ledger = $this->service->ledger($business);
+    $rows = $ledger['rows'];
+
+    expect($rows[0]['balance'])->toBe(5000000.0);
+    expect($rows[1]['expense'])->toBe(700000.0);
+    expect($rows[1]['balance'])->toBe(4300000.0);
+    expect($rows[2]['balance'])->toBe(6300000.0);
+
+    $period = $this->service->periodBounds($business, now()->parse('2026-08-25'));
+    $lr = $this->service->lr($business, $period);
+
+    expect($lr['expenses']['pre_operational'])->toBe(700000.0);
+    expect($lr['total_expense'])->toBe(700000.0);
+    expect($lr['profit'])->toBe(1300000.0);
+});
+
 test('ledger treats opening balance as a net-zero continuity marker', function () {
     $user = User::factory()->create();
     $business = Business::factory()->for($user)->create();

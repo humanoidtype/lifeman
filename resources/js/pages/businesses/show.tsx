@@ -34,6 +34,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import {
     Select,
     SelectContent,
@@ -41,7 +42,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import { formatDate, formatMoney } from '@/lib/format';
+import { formatDate, formatMoney, formatPercent } from '@/lib/format';
 import { cn, toUrl } from '@/lib/utils';
 import {
     destroy as destroyTransaction,
@@ -81,6 +82,7 @@ const categoryLabels: Record<string, string> = {
     raw_material: 'Bahan baku',
     operational: 'Operasional',
     marketing: 'Marketing',
+    pre_operational: 'Modal pra-operasional',
 };
 
 const formulaLabels: Record<string, string> = {
@@ -123,6 +125,7 @@ type AmountForm = {
     name: string;
     amount: string;
     initial_capital?: string;
+    pre_operational_amount?: string;
 };
 
 type DailyForm = {
@@ -169,6 +172,8 @@ export default function BusinessesShow({
     const initialCapital = ledger.rows.find(
         (row) => row.type === 'initial_capital',
     );
+    const modalAwal = initialCapital?.income ?? 0;
+    const totalLaba = lr_chart.reduce((sum, point) => sum + point.profit, 0);
 
     const rows = filterDate
         ? ledger.rows.filter((row) => row.date === filterDate)
@@ -548,6 +553,8 @@ export default function BusinessesShow({
                     lr={lr}
                     lrChart={lr_chart}
                 />
+
+                <PaybackCard modalAwal={modalAwal} totalLaba={totalLaba} />
             </div>
 
             <ConfirmDialog
@@ -593,6 +600,7 @@ function InitialCapitalCard({
         date: new Date().toISOString().slice(0, 10),
         name: 'Modal awal',
         amount: '',
+        pre_operational_amount: '',
     });
     const editForm = useForm<AmountForm>({
         type: 'initial_capital',
@@ -654,22 +662,56 @@ function InitialCapitalCard({
                 </CardDescription>
             </CardHeader>
             {!capital && (
-                <CardContent className="grid grid-cols-[1fr_auto] gap-2">
-                    <Input
-                        type="number"
-                        min="0"
-                        inputMode="numeric"
-                        placeholder="1000000"
-                        value={createForm.data.amount}
-                        onChange={(event) =>
-                            createForm.setData('amount', event.target.value)
-                        }
-                    />
+                <CardContent className="grid gap-3">
+                    <div className="grid gap-2 sm:grid-cols-2">
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="capital-amount">Modal awal</Label>
+                            <Input
+                                id="capital-amount"
+                                type="number"
+                                min="0"
+                                inputMode="numeric"
+                                placeholder="1000000"
+                                value={createForm.data.amount}
+                                onChange={(event) =>
+                                    createForm.setData(
+                                        'amount',
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </div>
+                        <div className="grid gap-1.5">
+                            <Label htmlFor="pre-operational-amount">
+                                Modal pra-operasional (opsional)
+                            </Label>
+                            <Input
+                                id="pre-operational-amount"
+                                type="number"
+                                min="0"
+                                inputMode="numeric"
+                                placeholder="0"
+                                value={createForm.data.pre_operational_amount}
+                                onChange={(event) =>
+                                    createForm.setData(
+                                        'pre_operational_amount',
+                                        event.target.value,
+                                    )
+                                }
+                            />
+                        </div>
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                        Bagian modal yang sudah dipakai untuk kebutuhan awal
+                        (peralatan, izin, dsb.) — otomatis tercatat sebagai
+                        pengeluaran supaya kas balance.
+                    </p>
                     <Button
                         onClick={submitCreate}
                         disabled={
                             createForm.processing || !createForm.data.amount
                         }
+                        className="justify-self-end"
                     >
                         {createForm.processing && (
                             <Loader2 className="size-4 animate-spin" />
@@ -677,13 +719,18 @@ function InitialCapitalCard({
                         Simpan
                     </Button>
                     {createForm.errors.amount && (
-                        <p className="col-span-2 text-sm text-destructive">
+                        <p className="text-sm text-destructive">
                             {createForm.errors.amount}
                         </p>
                     )}
                     {createForm.errors.initial_capital && (
-                        <p className="col-span-2 text-sm text-destructive">
+                        <p className="text-sm text-destructive">
                             {createForm.errors.initial_capital}
+                        </p>
+                    )}
+                    {createForm.errors.pre_operational_amount && (
+                        <p className="text-sm text-destructive">
+                            {createForm.errors.pre_operational_amount}
                         </p>
                     )}
                 </CardContent>
@@ -1103,6 +1150,64 @@ function LedgerItem({
     );
 }
 
+function PaybackCard({
+    modalAwal,
+    totalLaba,
+}: {
+    modalAwal: number;
+    totalLaba: number;
+}) {
+    if (modalAwal <= 0) {
+        return null;
+    }
+
+    const percent = Math.min(Math.max((totalLaba / modalAwal) * 100, 0), 100);
+    const remaining = Math.max(modalAwal - totalLaba, 0);
+    const reached = totalLaba >= modalAwal;
+
+    return (
+        <Card>
+            <CardHeader className="pb-2">
+                <CardTitle className="text-base">Balik Modal</CardTitle>
+                <CardDescription>
+                    Seberapa jauh laba sudah menutup modal awal{' '}
+                    {formatMoney(modalAwal)}.
+                </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-3">
+                <div className="flex items-baseline justify-between text-sm">
+                    <span className="font-semibold">
+                        {formatPercent(percent)}
+                    </span>
+                    <span className="text-muted-foreground">
+                        {formatMoney(Math.max(totalLaba, 0))} dari{' '}
+                        {formatMoney(modalAwal)}
+                    </span>
+                </div>
+                <div className="h-3 overflow-hidden rounded-full bg-muted">
+                    <div
+                        className={cn(
+                            'h-full rounded-full transition-all duration-700',
+                            reached ? 'bg-emerald-500' : 'bg-primary',
+                        )}
+                        style={{ width: `${percent}%` }}
+                    />
+                </div>
+                <p
+                    className={cn(
+                        'text-sm',
+                        reached && 'font-medium text-emerald-600',
+                    )}
+                >
+                    {reached
+                        ? 'Sudah balik modal, mantap!'
+                        : `Kurang ${formatMoney(remaining)} lagi`}
+                </p>
+            </CardContent>
+        </Card>
+    );
+}
+
 function LrCard({
     business,
     ledgerRows,
@@ -1205,6 +1310,7 @@ function LrCard({
                                 ? (actual / displayed.income) * 100
                                 : 0;
                         const diff = actualPct - expected;
+                        const hasFormula = key in business.formula;
 
                         return (
                             <div
@@ -1218,7 +1324,8 @@ function LrCard({
                                     <span
                                         className={cn(
                                             'font-semibold',
-                                            displayed.income > 0 &&
+                                            hasFormula &&
+                                                displayed.income > 0 &&
                                                 Math.abs(diff) > 2 &&
                                                 (diff > 0
                                                     ? 'text-destructive'
@@ -1227,9 +1334,15 @@ function LrCard({
                                     >
                                         {formatMoney(actual)}
                                     </span>
-                                    <span className="w-20 text-right text-xs text-muted-foreground">
-                                        {actualPct.toFixed(1)}% / rumus{' '}
-                                        {expected}%
+                                    <span className="w-24 text-right text-xs text-muted-foreground">
+                                        {hasFormula ? (
+                                            <>
+                                                {actualPct.toFixed(1)}% / rumus{' '}
+                                                {expected}%
+                                            </>
+                                        ) : (
+                                            `${actualPct.toFixed(1)}% dari pendapatan`
+                                        )}
                                     </span>
                                 </span>
                             </div>
@@ -1352,7 +1465,12 @@ function computeLr(
     | 'analysis'
 > {
     let income = 0;
-    const expenses = { raw_material: 0, operational: 0, marketing: 0 };
+    const expenses = {
+        raw_material: 0,
+        operational: 0,
+        marketing: 0,
+        pre_operational: 0,
+    };
 
     rows.forEach((row) => {
         if (row.date < start || row.date > end) {
@@ -1369,7 +1487,10 @@ function computeLr(
     });
 
     const total_expense =
-        expenses.raw_material + expenses.operational + expenses.marketing;
+        expenses.raw_material +
+        expenses.operational +
+        expenses.marketing +
+        expenses.pre_operational;
 
     return {
         start,
@@ -1379,6 +1500,7 @@ function computeLr(
             raw_material: Math.round(expenses.raw_material * 100) / 100,
             operational: Math.round(expenses.operational * 100) / 100,
             marketing: Math.round(expenses.marketing * 100) / 100,
+            pre_operational: Math.round(expenses.pre_operational * 100) / 100,
         },
         total_expense: Math.round(total_expense * 100) / 100,
         profit: Math.round((income - total_expense) * 100) / 100,

@@ -31,6 +31,12 @@ class StoreBusinessTransactionRequest extends FormRequest
                 'in:'.implode(',', BusinessTransaction::CATEGORIES),
             ],
             'amount' => ['required', 'numeric', 'min:0'],
+            'pre_operational_amount' => [
+                'nullable',
+                'numeric',
+                'min:0',
+                'prohibited_unless:type,'.BusinessTransaction::TYPE_INITIAL_CAPITAL,
+            ],
         ];
     }
 
@@ -44,6 +50,7 @@ class StoreBusinessTransactionRequest extends FormRequest
             'category.required_if' => 'Jenis pengeluaran wajib dipilih.',
             'amount.required' => 'Nominal wajib diisi.',
             'amount.min' => 'Nominal tidak boleh negatif.',
+            'pre_operational_amount.prohibited_unless' => 'Modal pra-operasional hanya bisa dicatat bersama modal awal.',
         ];
     }
 }

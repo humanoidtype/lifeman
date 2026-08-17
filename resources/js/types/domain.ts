@@ -101,7 +101,8 @@ export type BusinessTransaction = {
         | 'expense_big'
         | 'opening_balance';
     name: string;
-    category: 'raw_material' | 'operational' | 'marketing' | null;
+    category:
+        'raw_material' | 'operational' | 'marketing' | 'pre_operational' | null;
     amount: string;
 };
 
@@ -131,6 +132,7 @@ export type LrSummary = {
         raw_material: number;
         operational: number;
         marketing: number;
+        pre_operational: number;
     };
     total_expense: number;
     profit: number;

@@ -146,3 +146,61 @@ test('users cannot update another users transaction', function () {
         ->patch(route('business-transactions.update', $transaction), ['amount' => 1])
         ->assertForbidden();
 });
+
+test('pre-operational amount creates an additional expense transaction', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create();
+
+    $this->actingAs($user)
+        ->post(route('business-transactions.store', $business), [
+            'type' => BusinessTransaction::TYPE_INITIAL_CAPITAL,
+            'date' => '2026-08-17',
+            'name' => 'Modal awal',
+            'amount' => 5000000,
+            'pre_operational_amount' => 700000,
+        ])
+        ->assertRedirect();
+
+    $transactions = $business->transactions()->orderBy('id')->get();
+
+    expect($transactions)->toHaveCount(2);
+    expect($transactions[0]->type)->toBe(BusinessTransaction::TYPE_INITIAL_CAPITAL);
+    expect((float) $transactions[0]->amount)->toBe(5000000.0);
+
+    expect($transactions[1]->type)->toBe(BusinessTransaction::TYPE_EXPENSE_BIG);
+    expect($transactions[1]->category)->toBe(BusinessTransaction::CATEGORY_PRE_OPERATIONAL);
+    expect($transactions[1]->name)->toBe('Modal pra-operasional');
+    expect((float) $transactions[1]->amount)->toBe(700000.0);
+    expect($transactions[1]->date->toDateString())->toBe('2026-08-17');
+});
+
+test('pre-operational amount is optional when recording initial capital', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create();
+
+    $this->actingAs($user)
+        ->post(route('business-transactions.store', $business), [
+            'type' => BusinessTransaction::TYPE_INITIAL_CAPITAL,
+            'date' => '2026-08-17',
+            'name' => 'Modal awal',
+            'amount' => 5000000,
+        ])
+        ->assertRedirect();
+
+    expect($business->transactions()->count())->toBe(1);
+});
+
+test('pre-operational amount is rejected outside initial capital', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create();
+
+    $this->actingAs($user)
+        ->post(route('business-transactions.store', $business), [
+            'type' => BusinessTransaction::TYPE_INCOME,
+            'date' => '2026-08-18',
+            'name' => 'Pendapatan',
+            'amount' => 100000,
+            'pre_operational_amount' => 50000,
+        ])
+        ->assertSessionHasErrors('pre_operational_amount');
+});

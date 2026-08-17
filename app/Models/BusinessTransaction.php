@@ -44,6 +44,8 @@ class BusinessTransaction extends Model
 
     public const CATEGORY_MARKETING = 'marketing';
 
+    public const CATEGORY_PRE_OPERATIONAL = 'pre_operational';
+
     public const TYPES = [
         self::TYPE_INITIAL_CAPITAL,
         self::TYPE_DAILY_MODAL,
@@ -68,6 +70,7 @@ class BusinessTransaction extends Model
         self::CATEGORY_RAW_MATERIAL,
         self::CATEGORY_OPERATIONAL,
         self::CATEGORY_MARKETING,
+        self::CATEGORY_PRE_OPERATIONAL,
     ];
 
     /**

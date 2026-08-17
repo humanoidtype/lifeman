@@ -240,6 +240,7 @@ class BusinessPeriodService
             BusinessTransaction::CATEGORY_RAW_MATERIAL => 0.0,
             BusinessTransaction::CATEGORY_OPERATIONAL => 0.0,
             BusinessTransaction::CATEGORY_MARKETING => 0.0,
+            BusinessTransaction::CATEGORY_PRE_OPERATIONAL => 0.0,
         ];
 
         foreach ($transactions as $transaction) {
@@ -298,6 +299,7 @@ class BusinessPeriodService
                 'raw_material' => round($categories[BusinessTransaction::CATEGORY_RAW_MATERIAL], 2),
                 'operational' => round($categories[BusinessTransaction::CATEGORY_OPERATIONAL], 2),
                 'marketing' => round($categories[BusinessTransaction::CATEGORY_MARKETING], 2),
+                'pre_operational' => round($categories[BusinessTransaction::CATEGORY_PRE_OPERATIONAL], 2),
             ],
             'total_expense' => round($totalExpense, 2),
             'profit' => round($profit, 2),
