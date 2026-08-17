@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Request;
+use Inertia\AlwaysProp;
 use Inertia\Middleware;
 
 class HandleInertiaRequests extends Middleware
@@ -41,10 +42,10 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'flash' => [
+            'flash' => new AlwaysProp([
                 'success' => fn () => $request->session()->get('success'),
                 'error' => fn () => $request->session()->get('error'),
-            ],
+            ]),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
             'appVersion' => json_decode((string) file_get_contents(base_path('package.json')), true)['version'] ?? 'dev',
         ];

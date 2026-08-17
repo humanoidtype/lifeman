@@ -232,3 +232,34 @@ test('closing the kas without transactions is rejected', function () {
         ->post(route('businesses.close', $business))
         ->assertSessionHas('error');
 });
+
+test('flash success is delivered on partial reload responses', function () {
+    $user = User::factory()->create();
+    $business = Business::factory()->for($user)->create();
+
+    $headers = [
+        'X-Inertia' => 'true',
+        'X-Inertia-Version' => file_exists(public_path('build/manifest.json'))
+            ? hash_file('xxh128', public_path('build/manifest.json'))
+            : null,
+        'X-Inertia-Partial-Component' => 'businesses/show',
+        'X-Inertia-Partial-Data' => 'ledger,days,lr,lr_chart,kas_opened_at',
+    ];
+
+    $this->actingAs($user)
+        ->withHeaders($headers)
+        ->post(route('business-transactions.store', $business), [
+            'type' => BusinessTransaction::TYPE_INCOME,
+            'date' => now()->toDateString(),
+            'name' => 'Pendapatan',
+            'amount' => 100000,
+        ])
+        ->assertRedirect();
+
+    $this->actingAs($user)
+        ->withHeaders($headers)
+        ->get(route('businesses.show', $business))
+        ->assertOk()
+        ->assertJsonPath('props.flash.success', 'Transaksi berhasil dicatat.')
+        ->assertJsonPath('props.ledger.rows.0.type', BusinessTransaction::TYPE_INCOME);
+});
