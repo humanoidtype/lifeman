@@ -9,6 +9,7 @@ import {
     Trash2,
 } from 'lucide-react';
 import { useState } from 'react';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { FilterBar } from '@/components/filter-bar';
 import { Pagination } from '@/components/pagination';
 import { Button } from '@/components/ui/button';
@@ -147,15 +148,26 @@ function ReminderCard({
     const isDone = reminder.done_at !== null;
     const isExpired = !isDone && reminder.is_expired;
     const Icon = isDone ? CircleCheck : isExpired ? CalendarX2 : Clock3;
+    const [confirmOpen, setConfirmOpen] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     function markDone(): void {
-        router.patch(toUrl(done({ reminder: reminder.id })));
+        router.patch(toUrl(done({ reminder: reminder.id })), undefined, {
+            only: ['reminders'],
+            preserveScroll: true,
+        });
     }
 
-    function remove(): void {
-        if (window.confirm(`Hapus ingetin "${reminder.title}"?`)) {
-            router.delete(toUrl(destroy({ reminder: reminder.id })));
-        }
+    function confirmDelete(): void {
+        router.delete(toUrl(destroy({ reminder: reminder.id })), {
+            only: ['reminders'],
+            preserveScroll: true,
+            onStart: () => setDeleting(true),
+            onFinish: () => {
+                setDeleting(false);
+                setConfirmOpen(false);
+            },
+        });
     }
 
     return (
@@ -218,11 +230,24 @@ function ReminderCard({
                     <Button size="icon" variant="ghost" onClick={onEdit}>
                         <Pencil className="size-4" />
                     </Button>
-                    <Button size="icon" variant="ghost" onClick={remove}>
+                    <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setConfirmOpen(true)}
+                    >
                         <Trash2 className="size-4 text-destructive" />
                     </Button>
                 </div>
             </CardContent>
+
+            <ConfirmDialog
+                open={confirmOpen}
+                onOpenChange={setConfirmOpen}
+                title="Hapus ingetin"
+                description={`Hapus ingetin "${reminder.title}"?`}
+                processing={deleting}
+                onConfirm={confirmDelete}
+            />
         </Card>
     );
 }
@@ -262,9 +287,17 @@ function ReminderFormDialog({
         };
 
         if (isEditing && reminder) {
-            put(toUrl(update({ reminder: reminder.id })), { onSuccess });
+            put(toUrl(update({ reminder: reminder.id })), {
+                only: ['reminders'],
+                preserveScroll: true,
+                onSuccess,
+            });
         } else {
-            post(toUrl(store()), { onSuccess });
+            post(toUrl(store()), {
+                only: ['reminders'],
+                preserveScroll: true,
+                onSuccess,
+            });
         }
     }
 

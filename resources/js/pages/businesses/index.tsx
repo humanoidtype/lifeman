@@ -1,5 +1,7 @@
 import { Head, Link, router } from '@inertiajs/react';
 import { ArrowRight, Briefcase, Plus, Trash2 } from 'lucide-react';
+import { useState } from 'react';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,14 +21,23 @@ type Props = {
 };
 
 export default function BusinessesIndex({ businesses }: Props) {
-    function remove(business: Business): void {
-        if (
-            window.confirm(
-                `Hapus manajemen bisnis "${business.name}"? Semua catatannya ikut terhapus.`,
-            )
-        ) {
-            router.delete(toUrl(destroy({ business: business.id })));
+    const [pending, setPending] = useState<Business | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    function confirmDelete(): void {
+        if (!pending) {
+            return;
         }
+
+        router.delete(toUrl(destroy({ business: pending.id })), {
+            only: ['businesses'],
+            preserveScroll: true,
+            onStart: () => setDeleting(true),
+            onFinish: () => {
+                setDeleting(false);
+                setPending(null);
+            },
+        });
     }
 
     return (
@@ -106,7 +117,9 @@ export default function BusinessesIndex({ businesses }: Props) {
                                             <Button
                                                 size="icon"
                                                 variant="ghost"
-                                                onClick={() => remove(business)}
+                                                onClick={() =>
+                                                    setPending(business)
+                                                }
                                                 className="size-8"
                                             >
                                                 <Trash2 className="size-4 text-destructive" />
@@ -129,6 +142,19 @@ export default function BusinessesIndex({ businesses }: Props) {
                     </div>
                 )}
             </div>
+
+            <ConfirmDialog
+                open={pending !== null}
+                onOpenChange={(open) => !open && setPending(null)}
+                title="Hapus bisnis"
+                description={
+                    pending
+                        ? `Hapus manajemen bisnis "${pending.name}"? Semua catatannya ikut terhapus.`
+                        : undefined
+                }
+                processing={deleting}
+                onConfirm={confirmDelete}
+            />
         </>
     );
 }

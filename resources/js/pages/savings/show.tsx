@@ -12,6 +12,7 @@ import {
 import { CalendarClock, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import { Line } from 'react-chartjs-2';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { Button } from '@/components/ui/button';
 import {
     Card,
@@ -67,6 +68,10 @@ export default function SavingsShow({ goal, payments }: Props) {
     const reached = paid >= target;
     const remaining = Math.max(target - paid, 0);
     const [editing, setEditing] = useState<SavingsPayment | null>(null);
+    const [pendingDelete, setPendingDelete] = useState<SavingsPayment | null>(
+        null,
+    );
+    const [deleting, setDeleting] = useState(false);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -89,16 +94,29 @@ export default function SavingsShow({ goal, payments }: Props) {
 
     function addPayment(): void {
         post(toUrl(storePayment({ savings_goal: goal.id })), {
+            only: ['goal', 'payments'],
+            preserveScroll: true,
             onSuccess: () => reset(),
         });
     }
 
-    function removePayment(payment: SavingsPayment): void {
-        if (window.confirm(`Hapus cicilan ${formatMoney(payment.amount)}?`)) {
-            router.delete(
-                toUrl(destroyPayment({ savings_payment: payment.id })),
-            );
+    function confirmDeletePayment(): void {
+        if (!pendingDelete) {
+            return;
         }
+
+        router.delete(
+            toUrl(destroyPayment({ savings_payment: pendingDelete.id })),
+            {
+                only: ['goal', 'payments'],
+                preserveScroll: true,
+                onStart: () => setDeleting(true),
+                onFinish: () => {
+                    setDeleting(false);
+                    setPendingDelete(null);
+                },
+            },
+        );
     }
 
     const sortedPayments = [...payments].sort(
@@ -372,7 +390,9 @@ export default function SavingsShow({ goal, payments }: Props) {
                                     <Button
                                         size="icon"
                                         variant="ghost"
-                                        onClick={() => removePayment(payment)}
+                                        onClick={() =>
+                                            setPendingDelete(payment)
+                                        }
                                     >
                                         <Trash2 className="size-4 text-destructive" />
                                     </Button>
@@ -389,6 +409,19 @@ export default function SavingsShow({ goal, payments }: Props) {
                     />
                 )}
             </div>
+
+            <ConfirmDialog
+                open={pendingDelete !== null}
+                onOpenChange={(open) => !open && setPendingDelete(null)}
+                title="Hapus cicilan"
+                description={
+                    pendingDelete
+                        ? `Hapus cicilan ${formatMoney(pendingDelete.amount)}?`
+                        : undefined
+                }
+                processing={deleting}
+                onConfirm={confirmDeletePayment}
+            />
         </>
     );
 }

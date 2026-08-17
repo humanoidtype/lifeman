@@ -1,6 +1,7 @@
 import { Head, router, useForm } from '@inertiajs/react';
 import { Minus, Pencil, Plus, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { ConfirmDialog } from '@/components/confirm-dialog';
 import { NettoBadge } from '@/components/netto-badge';
 import { Button } from '@/components/ui/button';
 import {
@@ -154,6 +155,8 @@ function IncomeSection({
 
     function addItem(): void {
         post(toUrl(storeItem({ cashflow: cashflowId })), {
+            only: ['cashflow', 'items'],
+            preserveScroll: true,
             onSuccess: () => reset(),
         });
     }
@@ -244,6 +247,8 @@ function ExpenseSection({
 
     function addItem(): void {
         post(toUrl(storeItem({ cashflow: cashflowId })), {
+            only: ['cashflow', 'items'],
+            preserveScroll: true,
             onSuccess: () => reset(),
         });
     }
@@ -365,10 +370,23 @@ function ItemList({
     sign: string;
     showQuantity: boolean;
 }) {
-    function removeItem(item: CashflowItem): void {
-        if (window.confirm(`Hapus item "${item.name}"?`)) {
-            router.delete(toUrl(destroyItem({ cashflow_item: item.id })));
+    const [pending, setPending] = useState<CashflowItem | null>(null);
+    const [deleting, setDeleting] = useState(false);
+
+    function confirmDeleteItem(): void {
+        if (!pending) {
+            return;
         }
+
+        router.delete(toUrl(destroyItem({ cashflow_item: pending.id })), {
+            only: ['cashflow', 'items'],
+            preserveScroll: true,
+            onStart: () => setDeleting(true),
+            onFinish: () => {
+                setDeleting(false);
+                setPending(null);
+            },
+        });
     }
 
     if (items.length === 0) {
@@ -380,42 +398,55 @@ function ItemList({
     }
 
     return (
-        <div className="grid gap-2">
-            {items.map((item) => (
-                <div
-                    key={item.id}
-                    className="flex items-center gap-3 rounded-lg border p-3 transition-colors duration-200 hover:bg-muted/50"
-                >
-                    <div className="min-w-0 flex-1">
-                        <p className="font-semibold">{item.name}</p>
-                        <p className="text-xs text-muted-foreground">
-                            {showQuantity && `${item.quantity} × `}
-                            {sign}
-                            {formatMoney(item.amount)}
-                            {showQuantity &&
-                                item.quantity > 1 &&
-                                ` = ${sign}${formatMoney(
-                                    Number(item.amount) * item.quantity,
-                                )}`}
-                        </p>
+        <>
+            <div className="grid gap-2">
+                {items.map((item) => (
+                    <div
+                        key={item.id}
+                        className="flex items-center gap-3 rounded-lg border p-3 transition-colors duration-200 hover:bg-muted/50"
+                    >
+                        <div className="min-w-0 flex-1">
+                            <p className="font-semibold">{item.name}</p>
+                            <p className="text-xs text-muted-foreground">
+                                {showQuantity && `${item.quantity} × `}
+                                {sign}
+                                {formatMoney(item.amount)}
+                                {showQuantity &&
+                                    item.quantity > 1 &&
+                                    ` = ${sign}${formatMoney(
+                                        Number(item.amount) * item.quantity,
+                                    )}`}
+                            </p>
+                        </div>
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => onEdit(item)}
+                        >
+                            <Pencil className="size-4" />
+                        </Button>
+                        <Button
+                            size="icon"
+                            variant="ghost"
+                            onClick={() => setPending(item)}
+                        >
+                            <Trash2 className="size-4 text-destructive" />
+                        </Button>
                     </div>
-                    <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => onEdit(item)}
-                    >
-                        <Pencil className="size-4" />
-                    </Button>
-                    <Button
-                        size="icon"
-                        variant="ghost"
-                        onClick={() => removeItem(item)}
-                    >
-                        <Trash2 className="size-4 text-destructive" />
-                    </Button>
-                </div>
-            ))}
-        </div>
+                ))}
+            </div>
+
+            <ConfirmDialog
+                open={pending !== null}
+                onOpenChange={(open) => !open && setPending(null)}
+                title="Hapus item"
+                description={
+                    pending ? `Hapus item "${pending.name}"?` : undefined
+                }
+                processing={deleting}
+                onConfirm={confirmDeleteItem}
+            />
+        </>
     );
 }
 
@@ -435,6 +466,8 @@ function EditItemDialog({
 
     function submit(): void {
         patch(toUrl(updateItem({ cashflow_item: item.id })), {
+            only: ['cashflow', 'items'],
+            preserveScroll: true,
             onSuccess: onClose,
         });
     }
